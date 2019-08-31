@@ -735,7 +735,9 @@ namespace SquadBuilderNS
             GameObject newUpgradePanel = MonoBehaviour.Instantiate(prefab, contentTransform);
 
             string upgradeType = AllUpgrades.Find(n => n.UpgradeName == upgrade.UpgradeName && n.UpgradeType == upgrade.UpgradeType).UpgradeTypeName;
-            GenericUpgrade newUpgrade = (GenericUpgrade)System.Activator.CreateInstance(Type.GetType(upgradeType));
+            GenericUpgrade newUpgrade = (upgradeType == "Omni") ?
+                new Omni(upgrade.Instance.UpgradeInfo) :
+                (GenericUpgrade)System.Activator.CreateInstance(Type.GetType(upgradeType));
             if (newUpgrade is IVariableCost && Edition.Current is SecondEdition) (newUpgrade as IVariableCost).UpdateCost(CurrentSquadBuilderShip.Instance);
             Edition.Current.AdaptUpgradeToRules(newUpgrade);
 

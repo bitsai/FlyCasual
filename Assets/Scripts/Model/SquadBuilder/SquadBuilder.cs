@@ -116,6 +116,14 @@ namespace SquadBuilderNS
         public GenericUpgrade Instance;
     }
 
+    public class Omni : GenericUpgrade
+    {
+        public Omni(UpgradeCardInfo upgradeCardInfo) : base()
+        {
+            UpgradeInfo = upgradeCardInfo;
+        }
+    }
+
     static partial class SquadBuilder
     {
         public static PlayerNo CurrentPlayer { get; private set; }
@@ -161,6 +169,7 @@ namespace SquadBuilderNS
         {
             AllShips = new List<ShipRecord>();
             AllPilots = new List<PilotRecord>();
+            AllUpgrades = new List<UpgradeRecord>();
 
             string namespacePart = "Ship." + Edition.Current.NameShort + ".";
 
@@ -230,6 +239,20 @@ namespace SquadBuilderNS
                                 PilotFaction = newShipContainer.Faction,
                                 Instance = newShipContainer
                             });
+
+                            AllUpgrades.Add(new UpgradeRecord()
+                            {
+                                UpgradeName = newShipContainer.PilotInfo.PilotName,
+                                UpgradeNameCanonical = newShipContainer.PilotNameCanonical,
+                                UpgradeTypeName = "Omni",
+                                UpgradeType = UpgradeType.Omni,
+                                Instance = new Omni(new UpgradeCardInfo(
+                                    newShipContainer.PilotInfo.PilotName,
+                                    UpgradeType.Omni,
+                                    cost: newShipContainer.PilotInfo.Initiative * 2,
+                                    abilityType: newShipContainer.PilotInfo.AbilityType
+                                ))
+                            });
                         }
 
                         result.Add(pilotKey);
@@ -242,8 +265,6 @@ namespace SquadBuilderNS
 
         private static void GenerateUpgradesList()
         {
-            AllUpgrades = new List<UpgradeRecord>();
-
             List<Type> typelist = Assembly.GetExecutingAssembly().GetTypes()
                 .Where(t => String.Equals(t.Namespace, "UpgradesList." + Edition.Current.NameShort, StringComparison.Ordinal))
                 .ToList();
@@ -310,8 +331,10 @@ namespace SquadBuilderNS
 
         private static bool InstallUpgrade(SquadBuilderShip ship, string upgradeName, UpgradeType upgradeType)
         {
-            string upgradeTypeName = AllUpgrades.Find(n => n.UpgradeName == upgradeName && n.UpgradeType == upgradeType).UpgradeTypeName;
-            GenericUpgrade newUpgrade = (GenericUpgrade)System.Activator.CreateInstance(Type.GetType(upgradeTypeName));
+            UpgradeRecord upgrade = AllUpgrades.Find(n => n.UpgradeName == upgradeName && n.UpgradeType == upgradeType);
+            GenericUpgrade newUpgrade = (upgrade.UpgradeTypeName == "Omni") ?
+                new Omni(upgrade.Instance.UpgradeInfo) :
+                (GenericUpgrade)System.Activator.CreateInstance(Type.GetType(upgrade.UpgradeTypeName));
             Edition.Current.AdaptUpgradeToRules(newUpgrade);
             if (newUpgrade is IVariableCost && Edition.Current is SecondEdition) (newUpgrade as IVariableCost).UpdateCost(ship.Instance);
 
