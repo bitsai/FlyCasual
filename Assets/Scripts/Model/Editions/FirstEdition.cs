@@ -162,7 +162,6 @@ namespace Editions
 
         public override string GetUpgradeImageUrl(GenericUpgrade upgrade)
         {
-            //TODO: support for PilotAbility upgrades
             return RootUrlForImages + "upgrades/" + ImageUrls.FormatUpgradeTypes(upgrade.UpgradeInfo.UpgradeTypes) + "/" + ImageUrls.FormatName(ImageUrls.FormatUpgradeName(upgrade.UpgradeInfo.Name)) + ".png";
         }
     }

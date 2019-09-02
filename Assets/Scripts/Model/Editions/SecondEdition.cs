@@ -300,14 +300,7 @@ namespace Editions
 
         public override string GetUpgradeImageUrl(GenericUpgrade upgrade)
         {
-            if (upgrade.HasType(UpgradeType.PilotAbility))
-            {
-                return RootUrlForImages + "Card_Pilot_" + upgrade.UpgradeInfo.SEImageNumber + ".png";
-            }
-            else
-            {
-                return RootUrlForImages + "Card_Upgrade_" + upgrade.UpgradeInfo.SEImageNumber + ((upgrade.IsSecondSide) ? "b" : "") + ".png";
-            }
+            return RootUrlForImages + "Card_Upgrade_" + upgrade.UpgradeInfo.SEImageNumber + ((upgrade.IsSecondSide) ? "b" : "") + ".png";
         }
 
     }
