@@ -300,7 +300,7 @@ namespace Editions
 
         public override string GetUpgradeImageUrl(GenericUpgrade upgrade)
         {
-            return RootUrlForImages + "Card_Upgrade_" + upgrade.UpgradeInfo.SEImageNumber + ((upgrade.IsSecondSide) ? "b" : "") + ".png";
+            return RootUrlForImages + "Card_Upgrade_" + upgrade.UpgradeInfo.SEImageNumber + ((upgrade.IsSecondSide)?"b":"") + ".png";
         }
 
     }
