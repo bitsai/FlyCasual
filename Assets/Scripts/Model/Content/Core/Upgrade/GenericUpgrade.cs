@@ -48,7 +48,8 @@ namespace Upgrade
         Configuration,
         TacticalRelay,
         None,
-        Omni // Free Mode Extra Option
+        Omni, // Free Mode Extra Option
+        PilotAbility // Free Mode Extra Option
     }
 
     public enum UpgradeSubType

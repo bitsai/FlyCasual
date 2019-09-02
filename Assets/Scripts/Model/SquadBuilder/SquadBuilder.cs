@@ -116,9 +116,9 @@ namespace SquadBuilderNS
         public GenericUpgrade Instance;
     }
 
-    public class Omni : GenericUpgrade
+    public class PilotAbility : GenericUpgrade
     {
-        public Omni(UpgradeCardInfo upgradeCardInfo) : base()
+        public PilotAbility(UpgradeCardInfo upgradeCardInfo) : base()
         {
             UpgradeInfo = upgradeCardInfo;
         }
@@ -244,13 +244,14 @@ namespace SquadBuilderNS
                             {
                                 UpgradeName = newShipContainer.PilotInfo.PilotName,
                                 UpgradeNameCanonical = newShipContainer.PilotNameCanonical,
-                                UpgradeTypeName = "Omni",
-                                UpgradeType = UpgradeType.Omni,
-                                Instance = new Omni(new UpgradeCardInfo(
+                                UpgradeTypeName = "PilotAbility",
+                                UpgradeType = UpgradeType.PilotAbility,
+                                Instance = new PilotAbility(new UpgradeCardInfo(
                                     newShipContainer.PilotInfo.PilotName,
-                                    UpgradeType.Omni,
+                                    UpgradeType.PilotAbility,
                                     cost: newShipContainer.PilotInfo.Initiative * 2,
-                                    abilityType: newShipContainer.PilotInfo.AbilityType
+                                    abilityType: newShipContainer.PilotInfo.AbilityType,
+                                    seImageNumber: newShipContainer.PilotInfo.SEImageNumber
                                 ))
                             });
                         }
@@ -332,8 +333,8 @@ namespace SquadBuilderNS
         private static bool InstallUpgrade(SquadBuilderShip ship, string upgradeName, UpgradeType upgradeType)
         {
             UpgradeRecord upgrade = AllUpgrades.Find(n => n.UpgradeName == upgradeName && n.UpgradeType == upgradeType);
-            GenericUpgrade newUpgrade = (upgrade.UpgradeTypeName == "Omni") ?
-                new Omni(upgrade.Instance.UpgradeInfo) :
+            GenericUpgrade newUpgrade = (upgrade.UpgradeType == UpgradeType.PilotAbility) ?
+                new PilotAbility(upgrade.Instance.UpgradeInfo) :
                 (GenericUpgrade)System.Activator.CreateInstance(Type.GetType(upgrade.UpgradeTypeName));
             Edition.Current.AdaptUpgradeToRules(newUpgrade);
             if (newUpgrade is IVariableCost && Edition.Current is SecondEdition) (newUpgrade as IVariableCost).UpdateCost(ship.Instance);
@@ -1169,6 +1170,9 @@ namespace SquadBuilderNS
                     break;
                 case "tacticalrelay":
                     result = UpgradeType.TacticalRelay;
+                    break;
+                case "pilotability":
+                    result = UpgradeType.PilotAbility;
                     break;
                 default:
                     string capitalizedName = upgradeXws.First().ToString().ToUpper() + upgradeXws.Substring(1);
