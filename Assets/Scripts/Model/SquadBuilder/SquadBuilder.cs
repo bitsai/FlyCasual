@@ -243,7 +243,7 @@ namespace SquadBuilderNS
                             PilotAbility upgrade = new PilotAbility(new UpgradeCardInfo(
                                 newShipContainer.PilotInfo.PilotName,
                                 UpgradeType.PilotAbility,
-                                cost: newShipContainer.PilotInfo.Initiative * 2,
+                                cost: 0,
                                 abilityType: newShipContainer.PilotInfo.AbilityType
                             ));
                             upgrade.ImageUrl = newShipContainer.ImageUrl;
