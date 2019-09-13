@@ -240,21 +240,23 @@ namespace SquadBuilderNS
                                 Instance = newShipContainer
                             });
 
-                            PilotAbility upgrade = new PilotAbility(new UpgradeCardInfo(
+                            PilotAbility newUpgradeContainer = new PilotAbility(new UpgradeCardInfo(
+                                // exclude ship names because some have a '/' character, causing problems when used as dice modification name
                                 newShipContainer.PilotInfo.PilotName,
                                 UpgradeType.PilotAbility,
                                 cost: 0,
                                 abilityType: newShipContainer.PilotInfo.AbilityType
                             ));
-                            upgrade.ImageUrl = newShipContainer.ImageUrl;
+                            newUpgradeContainer.ImageUrl = newShipContainer.ImageUrl;
+                            newUpgradeContainer.NameCanonical = newShipContainer.PilotNameCanonical + "(" + newShipContainer.ShipTypeCanonical + ")";
 
                             AllUpgrades.Add(new UpgradeRecord()
                             {
-                                UpgradeName = newShipContainer.PilotInfo.PilotName,
-                                UpgradeNameCanonical = newShipContainer.PilotNameCanonical,
+                                UpgradeName = newUpgradeContainer.UpgradeInfo.Name,
+                                UpgradeNameCanonical = newUpgradeContainer.NameCanonical,
                                 UpgradeTypeName = UpgradeType.PilotAbility.ToString(),
                                 UpgradeType = UpgradeType.PilotAbility,
-                                Instance = upgrade
+                                Instance = newUpgradeContainer
                             });
                         }
 
@@ -339,6 +341,7 @@ namespace SquadBuilderNS
                 new PilotAbility(upgrade.Instance.UpgradeInfo) :
                 (GenericUpgrade)System.Activator.CreateInstance(Type.GetType(upgrade.UpgradeTypeName));
             newUpgrade.ImageUrl = upgrade.Instance.ImageUrl;
+            newUpgrade.NameCanonical = upgrade.UpgradeNameCanonical;
             Edition.Current.AdaptUpgradeToRules(newUpgrade);
             if (newUpgrade is IVariableCost && Edition.Current is SecondEdition) (newUpgrade as IVariableCost).UpdateCost(ship.Instance);
 

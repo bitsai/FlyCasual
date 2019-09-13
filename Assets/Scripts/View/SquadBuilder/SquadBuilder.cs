@@ -740,6 +740,7 @@ namespace SquadBuilderNS
                 (GenericUpgrade)System.Activator.CreateInstance(Type.GetType(upgradeType));
             if (newUpgrade is IVariableCost && Edition.Current is SecondEdition) (newUpgrade as IVariableCost).UpdateCost(CurrentSquadBuilderShip.Instance);
             newUpgrade.ImageUrl = upgrade.Instance.ImageUrl;
+            newUpgrade.NameCanonical = upgrade.UpgradeNameCanonical;
             Edition.Current.AdaptUpgradeToRules(newUpgrade);
 
             UpgradePanelSquadBuilder script = newUpgradePanel.GetComponent<UpgradePanelSquadBuilder>();
