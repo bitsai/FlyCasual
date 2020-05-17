@@ -9,7 +9,7 @@ namespace UpgradesList.SecondEdition
             IsHidden = !DebugManager.FreeMode;
 
             UpgradeInfo = new UpgradeCardInfo(
-				"Force",
+                "Force",
                 UpgradeType.Talent,
                 cost: 0,
                 addForce: 1
