@@ -271,9 +271,6 @@ namespace Editions
                 case "tacticalrelay":
                     result = UpgradeType.TacticalRelay;
                     break;
-                case "pilotability":
-                    result = UpgradeType.PilotAbility;
-                    break;
                 default:
                     string capitalizedName = upgradeXws.First().ToString().ToUpper() + upgradeXws.Substring(1);
                     result = (UpgradeType)Enum.Parse(typeof(UpgradeType), capitalizedName);

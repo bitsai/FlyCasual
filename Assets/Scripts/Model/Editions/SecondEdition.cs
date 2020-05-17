@@ -417,9 +417,6 @@ namespace Editions
                 case UpgradeType.TacticalRelay:
                     result = "tactical-relay";
                     break;
-                case UpgradeType.PilotAbility:
-                    result = "pilot-ability";
-                    break;
                 default:
                     result = upgradeType.ToString().ToLower();
                     break;
@@ -439,9 +436,6 @@ namespace Editions
                     break;
                 case "tactical-relay":
                     result = UpgradeType.TacticalRelay;
-                    break;
-                case "pilot-ability":
-                    result = UpgradeType.PilotAbility;
                     break;
                 default:
                     string capitalizedName = upgradeXws.First().ToString().ToUpper() + upgradeXws.Substring(1);

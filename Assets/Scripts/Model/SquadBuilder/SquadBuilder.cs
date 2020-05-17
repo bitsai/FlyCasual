@@ -120,9 +120,9 @@ namespace SquadBuilderNS
         public GenericUpgrade Instance;
     }
 
-    public class PilotAbility : GenericUpgrade
+    public class OmniUpgrade : GenericUpgrade
     {
-        public PilotAbility(UpgradeCardInfo upgradeCardInfo) : base()
+        public OmniUpgrade(UpgradeCardInfo upgradeCardInfo) : base()
         {
             UpgradeInfo = upgradeCardInfo;
         }
@@ -266,10 +266,9 @@ namespace SquadBuilderNS
                                 Instance = newShipContainer
                             });
 
-                            PilotAbility newUpgradeContainer = new PilotAbility(new UpgradeCardInfo(
-                                // exclude ship names because some have a '/' character, causing problems when used as dice modification name
+                            OmniUpgrade newUpgradeContainer = new OmniUpgrade(new UpgradeCardInfo(
                                 newShipContainer.PilotInfo.PilotName,
-                                UpgradeType.PilotAbility,
+                                UpgradeType.Omni,
                                 cost: 0,
                                 abilityType: newShipContainer.PilotInfo.AbilityType
                             ));
@@ -280,8 +279,8 @@ namespace SquadBuilderNS
                             {
                                 UpgradeName = newUpgradeContainer.UpgradeInfo.Name,
                                 UpgradeNameCanonical = newUpgradeContainer.NameCanonical,
-                                UpgradeTypeName = UpgradeType.PilotAbility.ToString(),
-                                UpgradeType = UpgradeType.PilotAbility,
+                                UpgradeTypeName = UpgradeType.Omni.ToString(),
+                                UpgradeType = UpgradeType.Omni,
                                 Instance = newUpgradeContainer
                             });
                         }
@@ -399,8 +398,8 @@ namespace SquadBuilderNS
         private static bool InstallUpgrade(SquadBuilderShip ship, string upgradeNameCanonical, UpgradeType upgradeType)
         {
             UpgradeRecord upgrade = AllUpgrades.Find(n => n.UpgradeNameCanonical == upgradeNameCanonical && n.UpgradeType == upgradeType);
-            GenericUpgrade newUpgrade = (upgrade.UpgradeType == UpgradeType.PilotAbility) ?
-                new PilotAbility(upgrade.Instance.UpgradeInfo) :
+            GenericUpgrade newUpgrade = (upgrade.UpgradeType == UpgradeType.Omni) ?
+                new OmniUpgrade(upgrade.Instance.UpgradeInfo) :
                 (GenericUpgrade)System.Activator.CreateInstance(Type.GetType(upgrade.UpgradeTypeName));
             newUpgrade.ImageUrl = upgrade.Instance.ImageUrl;
             newUpgrade.NameCanonical = upgrade.UpgradeNameCanonical;
