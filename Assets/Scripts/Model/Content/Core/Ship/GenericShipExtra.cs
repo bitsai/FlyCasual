@@ -8,6 +8,7 @@ using Upgrade;
 using Editions;
 using SquadBuilderNS;
 using Tokens;
+using System.Linq;
 
 namespace Ship
 {
@@ -48,6 +49,9 @@ namespace Ship
 
         public event EventHandlerShipRefVector OnGetDockingRange;
 
+        public event EventHandlerBool OnSelectDamageCardToExpose;
+        public event EventHandlerDamageCard OnFaceupDamageCardIsRepaired;
+
         public GenericShip DockingHost;
 
         public Type ShipRuleType = typeof(Editions.FirstEdition);
@@ -56,7 +60,6 @@ namespace Ship
         public List<GenericShip> TwoTargetLocksOnDifferentTargetsAreAllowed = new List<GenericShip>();
         public List<GenericShip> TwoTargetLocksOnSameTargetsAreAllowed = new List<GenericShip>();
 
-        public string OldShipTypeName { get; protected set; }
 
         private string imageUrl;
         public string ImageUrl
@@ -295,6 +298,34 @@ namespace Ship
             if (OnOffTheBoard != null) OnOffTheBoard(ref shouldDestroyShip, direction);
         }
 
+        public event EventHandlerShipRefInt OnModifyAIStressPriority;
+
+        /// <summary>
+        /// This number can be used by the AI to determine who to assign stress to when there is a choice, 
+        /// or whether or not to use an ability or maneuver that causes stress.
+        /// Abilities and upgrades that makes stress more or less harmful should modify this number.
+        /// </summary>
+        public int GetAIStressPriority()
+        {
+            /*
+             * Default value for a ship is -50 + the number of blue maneuvers on its dial.
+             * 
+             * 100 - Always wants more stress tokens
+             * 90 - Wants to have multiple stress tokens (Ten Numb)
+             * 50 - Stress is a good thing, but not too much
+             * 0 - Stress is neither negative or positive for this ship
+             * -50 - Stress is always negative
+             * -100 - Stress is really bad for this ship, avoid at all cost!
+             */
+
+            var blueManeuverCount = this.Maneuvers.Values.Count(m => m == Movement.MovementComplexity.Easy);
+            var result = -50 + blueManeuverCount; 
+
+            if (OnModifyAIStressPriority != null) OnModifyAIStressPriority(this, ref result);
+
+            return result;
+        }
+
         // Squadbuilder
 
         public void CallOnPreInstallUpgrade(GenericUpgrade upgrade)
@@ -348,6 +379,24 @@ namespace Ship
             Vector2 dockingRange = new Vector2(0, 0);
             OnGetDockingRange?.Invoke(carrier, ref dockingRange);
             return dockingRange;
+        }
+
+        // Expose Damage Cards
+        public void CallSelectDamageCardToExpose(int index, Action<int, Action, bool> exposeFacedownCardByIndex, Action callback)
+        {
+            bool isOverriden = false;
+            OnSelectDamageCardToExpose?.Invoke(ref isOverriden);
+
+            Triggers.ResolveTriggers(
+                TriggerTypes.OnSelectDamageCardToExpose,
+                delegate { exposeFacedownCardByIndex.Invoke(index, callback, isOverriden); }
+            );
+        }
+
+        public void CallFaceupDamageCardIsRepaired(GenericDamageCard damageCard, Action callback)
+        {
+            OnFaceupDamageCardIsRepaired?.Invoke(damageCard);
+            Triggers.ResolveTriggers(TriggerTypes.OnFaceupDamageCardIsRepaired, callback);
         }
     }
 

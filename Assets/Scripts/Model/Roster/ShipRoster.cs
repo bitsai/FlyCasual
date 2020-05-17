@@ -30,44 +30,75 @@ public static partial class Roster
 
     public static List<GenericShip> Reserve;
 
+    public static GenericPlayer GetOpponent()
+    {
+        PlayerNo playerNo = PlayerNo.Player2;
+
+        if (Network.IsNetworkGame && !Network.IsServer) playerNo = PlayerNo.Player1;
+
+        return GetPlayer(playerNo);
+    }
+
+    public static GenericPlayer GetThisPlayer()
+    {
+        PlayerNo playerNo = PlayerNo.Player1;
+
+        if (Network.IsNetworkGame && !Network.IsServer) playerNo = PlayerNo.Player2;
+
+        return GetPlayer(playerNo);
+    }
+
     // SQUADRONS
 
-    private static void PrepareSquadrons()
+    private static IEnumerator PrepareSquadrons()
     {
+        GameInitializer.SetState(typeof(SquadsSyncCommand));
+
         if (ReplaysManager.Mode == ReplaysMode.Write)
         {
             foreach (var squad in SquadBuilder.SquadLists)
             {
-                JSONObject parameters = new JSONObject();
-                parameters.AddField("player", squad.PlayerNo.ToString());
-                parameters.AddField("type", squad.PlayerType.ToString());
-
                 squad.SavedConfiguration["description"].str = squad.SavedConfiguration["description"].str.Replace("\n", "");
-                parameters.AddField("list", squad.SavedConfiguration);
 
-                GameController.SendCommand(
-                    GameCommandTypes.SquadsSync,
-                    null,
-                    parameters.ToString()
+                GameController.SendCommand
+                (
+                    GenerateSyncSquadCommand
+                    (
+                        squad.PlayerNo.ToString(),
+                        squad.PlayerType.ToString(),
+                        Options.Title,
+                        Options.Avatar,
+                        squad.SavedConfiguration.ToString()
+                    )
                 );
+            }
 
-                Console.Write("Command is executed: " + GameCommandTypes.SquadsSync, LogTypes.GameCommands, true, "aqua");
-                GameController.GetCommand().Execute();
-            };
+            GameController.CheckExistingCommands();
         }
         else if (ReplaysManager.Mode == ReplaysMode.Read)
         {
-            for (int i = 0; i < 2; i++)
-            {
-                GameCommand command = GameController.GetCommand();
-                if (command.Type == GameCommandTypes.SquadsSync)
-                {
-                    Console.Write("Command is executed: " + command.Type, LogTypes.GameCommands, true, "aqua");
-                    command.Execute();
-                }
-            }
+            GameController.CheckExistingCommands();
         }
 
+        while (GameInitializer.AcceptsCommandType == typeof(SquadsSyncCommand) && GameInitializer.CommandsReceived < 2)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
+    public static GameCommand GenerateSyncSquadCommand(string playerName, string playerType, string title, string avatar, string squadString)
+    {
+        JSONObject parameters = new JSONObject();
+        parameters.AddField("player", playerName);
+        parameters.AddField("type", playerType);
+        parameters.AddField("title", title);
+        parameters.AddField("list", JSONObject.Create(squadString));
+
+        return GameController.GenerateGameCommand(
+            GameCommandTypes.SquadsSync,
+            null,
+            parameters.ToString()
+        );
     }
 
     //PLAYERS CREATION
@@ -312,11 +343,11 @@ public static partial class Roster
     public static int CheckIsAnyTeamIsEliminated()
     {
         int result = 0;
-        if (Roster.GetPlayer(PlayerNo.Player1).Ships.Count == 0)
+        if (Roster.GetPlayer(PlayerNo.Player1).Ships.Count == 0 && !Roster.Reserve.Any(n => n.Owner.PlayerNo == PlayerNo.Player1))
         {
             result += 1;
         }
-        if (Roster.GetPlayer(PlayerNo.Player2).Ships.Count == 0)
+        if (Roster.GetPlayer(PlayerNo.Player2).Ships.Count == 0 && !Roster.Reserve.Any(n => n.Owner.PlayerNo == PlayerNo.Player2))
         {
             result += 2;
         }
@@ -339,11 +370,14 @@ public static partial class Roster
     {
         AllShipsHighlightOff();
 
-        foreach (GenericShip ship in Roster.AllUnits.Values)
+        if (GetPlayer(Phases.CurrentSubPhase.RequiredPlayer) is HumanPlayer)
         {
-            if (filter(ship))
+            foreach (GenericShip ship in Roster.AllUnits.Values)
             {
-                RosterPanelHighlightOn(ship);
+                if (filter(ship))
+                {
+                    RosterPanelHighlightOn(ship);
+                }
             }
         }
     }
@@ -389,7 +423,7 @@ public static partial class Roster
         Reserve.Remove(ship);
     }
 
-    public static void ToggleStatusPanel(PlayerNo playerNo, bool isActive)
+    public static void ToggleCalculatingStatus(PlayerNo playerNo, bool isActive)
     {
         Roster.GetPlayer(playerNo).PlayerInfoPanel.transform.Find("StatusPanel").gameObject.SetActive(isActive);
     }

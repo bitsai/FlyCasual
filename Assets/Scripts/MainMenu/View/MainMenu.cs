@@ -65,8 +65,10 @@ public partial class MainMenu : MonoBehaviour {
                 UpdatePlayerInfo();
                 break;
             case "OptionsPanel":
-                //Options.InitializePanel();
                 OptionsUI.Instance.InitializeOptionsPanel();
+                break;
+            case "StatsPanel":
+                StatsUI.Instance.InitializeStatsPanel();
                 break;
             case "ModsPanel":
                 ModsManager.InitializePanel();
@@ -75,7 +77,7 @@ public partial class MainMenu : MonoBehaviour {
                 CreditsUI.InitializePanel();
                 break;
             case "BrowseRoomsPanel":
-                Network.BrowseMatches();
+                BrowseMatches();
                 break;
             case "SelectFactionPanel":
                 SquadBuilder.SetCurrentPlayerFaction(Faction.None);

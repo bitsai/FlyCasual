@@ -13,7 +13,7 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Miranda Doni",
                     4,
-                    43,
+                    42,
                     isLimited: true,
                     abilityType: typeof(Abilities.SecondEdition.MirandaDoniAbility),
                     seImageNumber: 62
@@ -29,7 +29,7 @@ namespace Abilities.SecondEdition
     {
         protected override void CheckConditions()
         {
-            if (!IsAbilityUsed && Combat.ChosenWeapon.WeaponType == Ship.WeaponTypes.PrimaryWeapon)
+            if (Combat.ChosenWeapon.WeaponType == Ship.WeaponTypes.PrimaryWeapon)
             {
                 RegisterAbilityTrigger(TriggerTypes.OnShotStart, StartQuestionSubphase);
             }
@@ -66,6 +66,22 @@ namespace Abilities.SecondEdition
             selectMirandaDoniSubPhase.ShowSkipButton = true;
 
             selectMirandaDoniSubPhase.Start();
+        }
+
+        protected override string GetDefaultDecision()
+        {
+            string result = "No";
+
+            if (HostShip.State.ShieldsCurrent == 0)
+            {
+                result = "Roll 1 fewer die to recover 1 shield";
+            }
+            else
+            {
+                result = "Spend 1 shield to roll 1 extra die";
+            }
+
+            return result;
         }
     }
 }

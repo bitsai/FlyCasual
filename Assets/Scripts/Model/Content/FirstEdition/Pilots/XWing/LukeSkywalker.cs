@@ -18,6 +18,8 @@ namespace Ship
                     abilityType: typeof(LukeSkywalkerAbility),
                     extraUpgradeIcon: UpgradeType.Talent
                 );
+
+                ModelInfo.SkinName = "Luke Skywalker";
             }
         }
     }
@@ -39,7 +41,7 @@ namespace Abilities.FirstEdition
 
         private void AddLukeSkywalkerPilotAbility(GenericShip ship)
         {
-            ship.AddAvailableDiceModification(new LukeSkywalkerAction());
+            ship.AddAvailableDiceModificationOwn(new LukeSkywalkerAction());
         }
 
         private class LukeSkywalkerAction : ActionsList.GenericAction

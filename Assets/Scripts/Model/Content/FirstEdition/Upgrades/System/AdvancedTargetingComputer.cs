@@ -13,14 +13,13 @@ namespace UpgradesList.FirstEdition
         {
             UpgradeInfo = new UpgradeCardInfo(
                 "Adv. Targeting Computer",
-                UpgradeType.System,
+                UpgradeType.Sensor,
                 cost: 5,
                 abilityType: typeof(Abilities.FirstEdition.AdvancedTargetingComputerAbility),
                 restriction: new ShipRestriction(typeof(Ship.FirstEdition.TIEAdvanced.TIEAdvanced))
             );
 
-            // TODOREVERT
-            // ImageUrl = ImageUrls.GetImageUrl(this, "advanced-targeting-computer.png");
+            ImageUrl = ImageUrls.GetImageUrl(this, "advanced-targeting-computer");
         }
     }
 }
@@ -32,11 +31,18 @@ namespace Abilities.FirstEdition
         public override void ActivateAbility()
         {
             HostShip.OnGenerateDiceModifications += AdvancedTargetingComputerDiceModification;
+            HostShip.Ai.OnGetActionPriority += IncreaseAILockPriority;
         }
 
         public override void DeactivateAbility()
         {
             HostShip.OnGenerateDiceModifications -= AdvancedTargetingComputerDiceModification;
+            HostShip.Ai.OnGetActionPriority -= IncreaseAILockPriority;
+        }
+
+        private void IncreaseAILockPriority(GenericAction action, ref int priority)
+        {
+            if (action is TargetLockAction && TargetLockAction.HasValidLockTargetsAndNoLockOnShipInRange(HostShip)) priority = 55;
         }
 
         private void AdvancedTargetingComputerDiceModification(GenericShip host)
@@ -46,7 +52,7 @@ namespace Abilities.FirstEdition
                 ImageUrl = HostUpgrade.ImageUrl,
                 HostShip = host
             };
-            host.AddAvailableDiceModification(newAction);
+            host.AddAvailableDiceModificationOwn(newAction);
         }
     }
 }

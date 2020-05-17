@@ -11,10 +11,12 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Gamma Squadron Ace",
                     3,
-                    32,
+                    30,
                     extraUpgradeIcon: UpgradeType.Talent,
                     seImageNumber: 111
                 );
+
+                ModelInfo.SkinName = "Gamma Squadron";
             }
         }
     }

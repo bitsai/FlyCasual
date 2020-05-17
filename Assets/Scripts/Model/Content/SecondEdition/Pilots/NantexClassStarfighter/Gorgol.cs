@@ -21,7 +21,8 @@ namespace Ship
                     36,
                     isLimited: true,
                     abilityType: typeof(Abilities.SecondEdition.GorgolAbility),
-                    abilityText: "During the System Phase, you may gain 1 disarm token and choose a friendly ship at range 1-2. If you do, it gains 1 tractor token, then repairs 1 of its faceup Ship trait damage cards."
+                    abilityText: "During the System Phase, you may gain 1 disarm token and choose a friendly ship at range 1-2. If you do, it gains 1 tractor token, then repairs 1 of its faceup Ship trait damage cards.",
+                    extraUpgradeIcon: UpgradeType.Modification
                 );
 
                 ImageUrl = "https://images-cdn.fantasyflightgames.com/filer_public/6f/a2/6fa2fb39-4c76-4d21-8f3a-6910a34a7845/swz47_cards-gorgol.png";
@@ -56,7 +57,7 @@ namespace Abilities.SecondEdition
                 FilterTargets,
                 GetAiPriority,
                 HostShip.Owner.PlayerNo,
-                name: "Gorgol",
+                name: HostShip.PilotInfo.PilotName,
                 description: "You may gain 1 disarm token to choose a friednly ship, assign 1 tractor token to it, and then repair it's 1 faceup Ship damage card",
                 imageSource: HostShip
             );
@@ -107,17 +108,17 @@ namespace Abilities.SecondEdition
             else if (shipCritsList.Count > 1)
             {
                 GorgolDecisionSubPhase subphase = Phases.StartTemporarySubPhaseNew<GorgolDecisionSubPhase>(
-                    "Gorgol: Select faceup ship Crit",
+                    HostShip.PilotInfo.PilotName + ": Select faceup ship Crit",
                     Triggers.FinishTrigger
                 );
-                subphase.DescriptionShort = "Gorgol";
+                subphase.DescriptionShort = HostShip.PilotInfo.PilotName;
                 subphase.DescriptionLong = "Select a faceup ship Crit damage card to repair it";
                 subphase.ImageSource = HostShip;
                 subphase.Start();
             }
             else
             {
-                Messages.ShowInfo("Gorgol: To Ship faceup crits to repair");
+                Messages.ShowInfo(HostShip.PilotInfo.PilotName + ": To Ship faceup crits to repair");
                 Triggers.FinishTrigger();
             }
         }

@@ -18,8 +18,6 @@ namespace Ship.SecondEdition.Fireball
     {
         public Fireball() : base()
         {
-            RequiredMods = new List<System.Type>() { typeof(Mods.ModsList.UnreleasedContentMod) };
-
             ShipInfo = new ShipCardInfo
             (
                 "Fireball",
@@ -36,8 +34,8 @@ namespace Ship.SecondEdition.Fireball
                     UpgradeType.Title,
                     UpgradeType.Missile,
                     UpgradeType.Illicit,
-                    UpgradeType.Astromech,
-                    UpgradeType.Modification                    
+                    UpgradeType.Modification,
+                    UpgradeType.Modification
                 ),
                 abilityText: "Setup: You are dealt 1 facedown damage card. After you perform a slam action, you may expose 1 damage card to remove 1 disarm token"
             );
@@ -45,7 +43,7 @@ namespace Ship.SecondEdition.Fireball
             ShipAbilities.Add(new Abilities.SecondEdition.ExplosionWithWings());
 
             IconicPilots = new Dictionary<Faction, System.Type> {
-                { Faction.Resistance, typeof(ColossusStationMechanic) }
+                { Faction.Resistance, typeof(KazudaXiono) }
             };
 
             ModelInfo = new ShipModelInfo(
@@ -70,7 +68,7 @@ namespace Ship.SecondEdition.Fireball
 
                 new ManeuverInfo(ManeuverSpeed.Speed3, ManeuverDirection.Left, ManeuverBearing.Turn, MovementComplexity.Complex),
                 new ManeuverInfo(ManeuverSpeed.Speed3, ManeuverDirection.Left, ManeuverBearing.Bank, MovementComplexity.Normal),
-                new ManeuverInfo(ManeuverSpeed.Speed3, ManeuverDirection.Forward, ManeuverBearing.Straight, MovementComplexity.Easy),
+                new ManeuverInfo(ManeuverSpeed.Speed3, ManeuverDirection.Forward, ManeuverBearing.Straight, MovementComplexity.Normal),
                 new ManeuverInfo(ManeuverSpeed.Speed3, ManeuverDirection.Right, ManeuverBearing.Bank, MovementComplexity.Normal),
                 new ManeuverInfo(ManeuverSpeed.Speed3, ManeuverDirection.Right, ManeuverBearing.Turn, MovementComplexity.Complex),
                 new ManeuverInfo(ManeuverSpeed.Speed3, ManeuverDirection.Left, ManeuverBearing.TallonRoll, MovementComplexity.Complex),
@@ -155,14 +153,68 @@ namespace Abilities.SecondEdition
 
         private void DealDamageToItself(object sender, EventArgs e)
         {
-            HostShip.SufferHullDamage(
-                false,
-                new DamageSourceEventArgs
-                {
-                    Source = HostShip,
-                    DamageType = DamageTypes.CardAbility
-                }
-            );
+            if (!HostShip.UpgradeBar.HasUpgradeInstalled(typeof(UpgradesList.SecondEdition.KazsFireball)))
+            {
+                HostShip.SufferHullDamage(
+                    false,
+                    new DamageSourceEventArgs
+                    {
+                        Source = HostShip,
+                        DamageType = DamageTypes.CardAbility
+                    }
+                );
+            }
+            else
+            {
+                ShowShipCrits();
+            }
         }
+
+        protected void ShowShipCrits()
+        {
+            SelectShipCritDecision subphase = (SelectShipCritDecision)Phases.StartTemporarySubPhaseNew(
+                "Select Damage Card",
+                typeof(SelectShipCritDecision),
+                Triggers.FinishTrigger
+            );
+
+            List<GenericDamageCard> ownDeck = DamageDecks.GetDamageDeck(HostShip.Owner.PlayerNo).Deck;
+            foreach (var card in ownDeck.Where(n => n.Type == CriticalCardType.Ship))
+            {
+                Decision existingDecision = subphase.GetDecisions().Find(n => n.Name == card.Name);
+                if (existingDecision == null)
+                {
+                    subphase.AddDecision(card.Name, delegate { SelectDamageCard(card); }, card.ImageUrl, 1);
+                }
+                else
+                {
+                    existingDecision.SetCount(existingDecision.Count + 1);
+                }
+            }
+
+            subphase.DecisionViewType = DecisionViewTypes.ImagesDamageCard;
+
+            subphase.DefaultDecisionName = subphase.GetDecisions().First().Name;
+
+            subphase.DescriptionShort = "Kaz's Fireball: Select Damage Card";
+
+            subphase.RequiredPlayer = HostShip.Owner.PlayerNo;
+
+            subphase.Start();
+        }
+
+        protected void SelectDamageCard(GenericDamageCard damageCard)
+        {
+            Messages.ShowInfo(damageCard.Name + " has been selected");
+
+            DamageDeck ownDeck = DamageDecks.GetDamageDeck(HostShip.Owner.PlayerNo);
+            ownDeck.RemoveFromDamageDeck(damageCard);
+            ownDeck.ReShuffleDeck();
+
+            Combat.CurrentCriticalHitCard = damageCard;
+            HostShip.Damage.DealDrawnCard(DecisionSubPhase.ConfirmDecision);
+        }
+
+        protected class SelectShipCritDecision : DecisionSubPhase { };
     }
 }

@@ -26,26 +26,41 @@ namespace Players
         {
             base.AssignManeuversStart();
 
-            AssignManeuverRecursive();
+            if (!DebugManager.DebugStraightToCombat)
+            {
+                CalculateNavigation();
+            }
+            else
+            {
+                AssignManeuversRecursive();
+            }
         }
 
-        private void AssignManeuverRecursive()
+        private void CalculateNavigation()
         {
-            GenericShip shipWithoutManeuver = Ships.Values
-                .OrderBy(n => BoardTools.Board.DistanceToNearestEnemy(n))
-                .OrderBy(n => n.State.Initiative)
-                .Where(n => !n.State.IsIonized)
-                .FirstOrDefault(n => n.AssignedManeuver == null);
+            AI.Aggressor.NavigationSubSystem.CalculateNavigation(AssignManeuversRecursive);
+        }
+
+        private void AssignManeuversRecursive()
+        {
+            GenericShip shipWithoutManeuver = (!DebugManager.DebugStraightToCombat) ? AI.Aggressor.NavigationSubSystem.GetNextShipWithoutAssignedManeuver() : GetNextShipWithoutAssignedManeuver();
 
             if (shipWithoutManeuver != null)
             {
                 Selection.ChangeActiveShip(shipWithoutManeuver);
-                AI.Aggressor.NavigationSubSystem.CalculateNavigation(Selection.ThisShip, OpenDirectionsUiSilent);
+                OpenDirectionsUiSilent();
             }
             else
             {
                 GameMode.CurrentGameMode.ExecuteCommand(UI.GenerateNextButtonCommand());
             }
+        }
+
+        private GenericShip GetNextShipWithoutAssignedManeuver()
+        {
+            return Roster.GetPlayer(Phases.CurrentSubPhase.RequiredPlayer).Ships.Values
+                .Where(n => n.AssignedManeuver == null && !n.State.IsIonized)
+                .FirstOrDefault();
         }
 
         private void OpenDirectionsUiSilent()
@@ -57,10 +72,15 @@ namespace Players
 
         public override void AskAssignManeuver()
         {
-            Selection.ThisShip.Ai.TimeManeuverAssigned = Time.time;
-            ShipMovementScript.SendAssignManeuverCommand(Selection.ThisShip.ShipId, AI.Aggressor.NavigationSubSystem.BestManeuver);
-
-            AssignManeuverRecursive();
+            if (!DebugManager.DebugStraightToCombat)
+            {
+                AI.Aggressor.NavigationSubSystem.AssignPlannedManeuver(AssignManeuversRecursive);
+            }
+            else
+            {
+                ShipMovementScript.SendAssignManeuverCommand("2.F.S");
+                AssignManeuversRecursive();
+            }
         }
 
         protected override GenericShip SelectTargetForAttack()
@@ -125,23 +145,23 @@ namespace Players
             Roster.HighlightPlayer(PlayerNo);
             GameController.CheckExistingCommands();
 
-            bool foundToActivate = false;
-
-            foreach (var shipHolder in Roster.GetPlayer(Phases.CurrentPhasePlayer).Ships.OrderBy(n => n.Value.Ai.TimeManeuverAssigned))
+            GenericShip nextShip = (!DebugManager.DebugStraightToCombat) ? AI.Aggressor.NavigationSubSystem.GetNextShipWithoutFinishedManeuver() : GetNextShipWithoutFinishedManeuver();
+            if (nextShip != null)
             {
-                if (shipHolder.Value.State.Initiative == Phases.CurrentSubPhase.RequiredInitiative && !shipHolder.Value.IsManeuverPerformed)
-                {
-                    foundToActivate = true;
-                    Selection.ChangeActiveShip("ShipId:" + shipHolder.Value.ShipId);
-                    ActivateShip(shipHolder.Value);
-                    break;
-                }
+                Selection.ChangeActiveShip("ShipId:" + nextShip.ShipId);
+                ActivateShip(nextShip);
             }
-
-            if (!foundToActivate)
+            else
             {
                 Phases.Next();
             }
+        }
+
+        private static GenericShip GetNextShipWithoutFinishedManeuver()
+        {
+            return Roster.GetPlayer(Phases.CurrentSubPhase.RequiredPlayer).Ships.Values
+                .Where(n => !n.IsManeuverPerformed)
+                .FirstOrDefault();
         }
     }
 }

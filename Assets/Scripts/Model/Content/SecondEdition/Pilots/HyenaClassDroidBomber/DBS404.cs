@@ -16,7 +16,7 @@ namespace Ship.SecondEdition.HyenaClassDroidBomber
                 30,
                 isLimited: true,
                 abilityType: typeof(Abilities.SecondEdition.DBS404Ability),
-                extraUpgradeIcons: new List<UpgradeType> { UpgradeType.Torpedo, UpgradeType.Missile, UpgradeType.Bomb },
+                extraUpgradeIcons: new List<UpgradeType> { UpgradeType.Torpedo, UpgradeType.Missile, UpgradeType.Device },
                 pilotTitle: "Preservation Protocol Not Found"
             );
             
@@ -56,7 +56,7 @@ namespace Abilities.SecondEdition
         {
             if (Combat.ShotInfo.Range < 2)
             {
-                Messages.ShowInfo("DBS-404: Attacker rolls +1 attack die");
+                Messages.ShowInfo(HostShip.PilotInfo.PilotName + ": Attacker rolls +1 attack die");
                 count++;
             }
         }
@@ -71,7 +71,7 @@ namespace Abilities.SecondEdition
 
         private void SufferSelfDamage(object sender, EventArgs e)
         {
-            Messages.ShowInfo("DBS-404: Suffers critical damage");
+            Messages.ShowInfo(HostShip.PilotInfo.PilotName + ": Suffers critical damage");
 
             HostShip.Damage.TryResolveDamage(
                 0,

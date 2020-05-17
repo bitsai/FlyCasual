@@ -7,6 +7,7 @@ using SubPhases;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 using Upgrade;
 
@@ -21,7 +22,7 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Finch Dallow",
                     4,
-                    64,
+                    60,
                     isLimited: true,
                     abilityType: typeof(Abilities.SecondEdition.FinchDallowAbility)
                 );
@@ -50,7 +51,10 @@ namespace Abilities.SecondEdition
 
         private void RegisterTrigger()
         {
-            RegisterAbilityTrigger(TriggerTypes.OnBombWillBeDropped, AskToUseFinchDallowAbility);
+            if (BombsManager.CurrentDevice.UpgradeInfo.SubType == UpgradeSubType.Bomb)
+            {
+                RegisterAbilityTrigger(TriggerTypes.OnBombWillBeDropped, AskToUseFinchDallowAbility);
+            }
         }
 
         private void AskToUseFinchDallowAbility(object sender, System.EventArgs e)
@@ -222,8 +226,15 @@ namespace SubPhases
         public static GameCommand GeneratePlaceBombCommand(Vector3 position, Vector3 angles)
         {
             JSONObject parameters = new JSONObject();
-            parameters.AddField("positionX", position.x.ToString()); parameters.AddField("positionY", position.y.ToString()); parameters.AddField("positionZ", position.z.ToString());
-            parameters.AddField("rotationX", angles.x.ToString()); parameters.AddField("rotationY", angles.y.ToString()); parameters.AddField("rotationZ", angles.z.ToString());
+
+            parameters.AddField("positionX", position.x.ToString(CultureInfo.InvariantCulture));
+            parameters.AddField("positionY", position.y.ToString(CultureInfo.InvariantCulture));
+            parameters.AddField("positionZ", position.z.ToString(CultureInfo.InvariantCulture));
+
+            parameters.AddField("rotationX", angles.x.ToString(CultureInfo.InvariantCulture));
+            parameters.AddField("rotationY", angles.y.ToString(CultureInfo.InvariantCulture));
+            parameters.AddField("rotationZ", angles.z.ToString(CultureInfo.InvariantCulture));
+
             return GameController.GenerateGameCommand(
                 GameCommandTypes.BombPlacement,
                 typeof(PlaceBombTokenSubphase),

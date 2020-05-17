@@ -42,7 +42,7 @@ namespace Abilities
                     Source = HostUpgrade
                 };
 
-                host.AddAvailableDiceModification(action);
+                host.AddAvailableDiceModificationOwn(action);
             }
         }
     }
@@ -55,6 +55,11 @@ namespace ActionsList
         public ProtonTorpedoesDiceModificationSE()
         {
             IsTurnsOneFocusIntoSuccess = false;
+        }
+
+        public override bool IsDiceModificationAvailable()
+        {
+            return base.IsDiceModificationAvailable() && Combat.CurrentDiceRoll.HasResult(DieSide.Success);
         }
 
         public override int GetDiceModificationPriority()

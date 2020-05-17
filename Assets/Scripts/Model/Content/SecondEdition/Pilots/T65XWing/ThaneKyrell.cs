@@ -43,7 +43,7 @@ namespace Abilities.SecondEdition
 
         protected virtual void AddThaneKyrellAbility(GenericShip ship)
         {
-            ship.AddAvailableDiceModification(new ThaneKyrellDiceModificationSE() { HostShip = HostShip });
+            ship.AddAvailableDiceModificationOwn(new ThaneKyrellDiceModificationSE());
         }
     }
 }
@@ -52,10 +52,9 @@ namespace ActionsList.SecondEdition
 {
     public class ThaneKyrellDiceModificationSE : GenericAction
     {
-        public ThaneKyrellDiceModificationSE()
-        {
-            Name = DiceModificationName = "Thane Kyrell's ability";
-        }
+        public override string Name => HostShip.PilotInfo.PilotName;
+        public override string DiceModificationName => HostShip.PilotInfo.PilotName;
+        public override string ImageUrl => HostShip.ImageUrl;
 
         public override bool IsDiceModificationAvailable()
         {
@@ -71,7 +70,7 @@ namespace ActionsList.SecondEdition
             Triggers.RegisterTrigger(
                 new Trigger()
                 {
-                    Name = "Thane Kyrell's ability",
+                    Name = DiceModificationName,
                     TriggerOwner = HostShip.Owner.PlayerNo,
                     TriggerType = TriggerTypes.OnAbilityDirect,
                     EventHandler = StartSubphase
@@ -117,8 +116,9 @@ namespace SubPhases
             //Combat.DiceRollAttack.OrganizeDicePositions();
 
             var damageCardSubPhase = Phases.StartTemporarySubPhaseNew<SelectDamageCardDecisionSubPhase>(Name, Triggers.FinishTrigger);
+            damageCardSubPhase.DecisionOwnerPilot = HostShip;
             damageCardSubPhase.RegisterDamageCardHandler(HandleDamageCard);
-            damageCardSubPhase.withDamageCards = Combat.Defender;
+            damageCardSubPhase.DamageCardsOwner = Combat.Defender;
             damageCardSubPhase.Start();
         }
 

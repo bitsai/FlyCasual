@@ -19,7 +19,9 @@ namespace Ship
         Missile,
         Cannon,
         Turret,
-        Illicit
+        Illicit,
+        Talent,
+        Force
     }
 
     public partial class GenericShip

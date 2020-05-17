@@ -64,15 +64,21 @@ namespace Editions
         public abstract void SquadBuilderIsOpened();
         public abstract bool IsTokenCanBeDiscardedByJam(GenericToken token);
         public abstract string GetPilotImageUrl(GenericShip ship, string filename);
-        public abstract string GetUpgradeImageUrl(GenericUpgrade upgrade);
+        public abstract string GetUpgradeImageUrl(GenericUpgrade upgrade, string filename = null);
 
         public virtual void AdaptShipToRules(GenericShip ship) { }
         public virtual void AdaptPilotToRules(GenericShip ship) { }
         public virtual void AdaptUpgradeToRules(GenericUpgrade upgrade) { }
         public virtual void AdaptArcsToRules(GenericShip ship) { }
-        public virtual void RotateMobileFiringArc(ArcFacing facing) { }
-        public virtual void RotateMobileFiringArcAlt(ArcFacing facing) { }
+        public virtual void RotateMobileFiringArc(GenericArc arc, ArcFacing facing) { }
+        public virtual void RotateMobileFiringArcAlt(GenericArc arc, ArcFacing facing) { }
         public virtual void SubScribeToGenericShipEvents(GenericShip ship) { }
         public virtual void WhenIonized(GenericShip ship) { }
+
+        public abstract string FactionToXws(Faction faction);
+        public abstract Faction XwsToFaction(string factionXWS);
+
+        public abstract string UpgradeTypeToXws(UpgradeType faction);
+        public abstract UpgradeType XwsToUpgradeType(string upgradeXWS);
     }
 }

@@ -41,6 +41,9 @@ namespace Abilities.SecondEdition
                 if (movement.Bearing == ManeuverBearing.Straight || movement.Bearing == ManeuverBearing.Bank || movement.Bearing == ManeuverBearing.Turn)
                 {
                     movement.ColorComplexity = GenericMovement.ReduceComplexity(movement.ColorComplexity);
+                    // Update revealed dial in UI
+                    Roster.UpdateAssignedManeuverDial(HostShip, HostShip.AssignedManeuver);
+                    Messages.ShowInfo("R4 Astromech: Difficulty of maneuver is reduced");
                 }
             }
         }

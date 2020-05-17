@@ -17,7 +17,7 @@ namespace Ship.SecondEdition.V19TorrentStarfighter
             PilotInfo = new PilotCardInfo(
                 "\"Odd Ball\"",
                 5,
-                35,
+                34,
                 true,
                 abilityType: typeof(Abilities.SecondEdition.OddBallAbility),
                 extraUpgradeIcon: UpgradeType.Talent
@@ -46,7 +46,7 @@ namespace Abilities.SecondEdition
             HostShip.OnMovementFinishSuccessfully -= RegisterMovementTrigger;
         }
 
-        private void CheckConditions(GenericAction action)
+        protected void CheckConditions(GenericAction action)
         {
             if (action.IsRed && Board.GetShipsInBullseyeArc(HostShip, Team.Type.Enemy).Any())
             {
@@ -61,7 +61,7 @@ namespace Abilities.SecondEdition
             RegisterAbilityTrigger(TriggerTypes.OnFreeAction, AskAbility);
         }
 
-        private void RegisterMovementTrigger(GenericShip ship)
+        protected void RegisterMovementTrigger(GenericShip ship)
         {
             if (HostShip.GetLastManeuverColor() == MovementComplexity.Complex && Board.GetShipsInBullseyeArc(HostShip, Team.Type.Enemy).Any())
             {

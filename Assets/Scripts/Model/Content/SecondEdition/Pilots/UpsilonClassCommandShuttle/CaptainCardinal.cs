@@ -14,7 +14,7 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Captain Cardinal",
                     4,
-                    65,
+                    62,
                     isLimited: true,
                     charges: 2,
                     abilityType: typeof(Abilities.SecondEdition.CaptainCardinalAbility)
@@ -55,6 +55,8 @@ namespace Abilities.SecondEdition
         private bool IsDiceModificationAvailable()
         {
             if (HostShip.State.Charges == 0) return false;
+
+            if (Combat.CurrentDiceRoll.Focuses == 0) return false;
 
             GenericShip currentShip = (Combat.AttackStep == CombatStep.Attack) ? Combat.Attacker : Combat.Defender;
 

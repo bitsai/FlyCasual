@@ -11,7 +11,7 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Sun Fac",
                     6,
-                    56,
+                    54,
                     isLimited: true,
                     extraUpgradeIcon: UpgradeType.Talent,
                     abilityType: typeof(Abilities.SecondEdition.SunFacAbility),
@@ -42,7 +42,7 @@ namespace Abilities.SecondEdition
         {
             if (Combat.Defender.IsTractored)
             {
-                Messages.ShowInfo("The defender is tractored, you roll an additional attack die");
+                Messages.ShowInfo(HostShip.PilotInfo.PilotName + ": The defender is tractored, you roll an additional attack die");
                 count++;
             }
         }

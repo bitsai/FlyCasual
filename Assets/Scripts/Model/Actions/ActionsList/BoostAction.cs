@@ -9,6 +9,7 @@ using Obstacles;
 using ActionsList;
 using Actions;
 using Bombs;
+using Ship;
 
 namespace ActionsList
 {
@@ -217,17 +218,12 @@ namespace SubPhases
             if (SelectedBoostHelper != null)
             {
                 (HostAction as BoostAction).SelectedBoostTemplate = SelectedBoostHelper;
-                TryPerformBoost();
+                TryConfirmBoostPosition();
             }
             else
             {
                 CancelBoost(new List<ActionFailReason>() { ActionFailReason.NoTemplateAvailable});
             }
-        }
-
-        public void TryPerformBoost()
-        {
-            GameMode.CurrentGameMode.TryConfirmBoostPosition(SelectedBoostHelper);
         }
 
         private void ShowBoosterHelper()
@@ -242,7 +238,7 @@ namespace SubPhases
             obstaclesStayDetectorMovementTemplate.TheShip = TheShip;
         }
 
-        public virtual void StartBoostExecution()
+        public virtual void StartBoostExecution(ShipPositionInfo finalPositionInfo)
         {
             BoostExecutionSubPhase execution = (BoostExecutionSubPhase) Phases.StartTemporarySubPhaseNew(
                 "Boost execution",
@@ -252,6 +248,7 @@ namespace SubPhases
             execution.TheShip = TheShip;
             execution.IsTractorBeamBoost = IsTractorBeamBoost;
             execution.SelectedBoostHelper = SelectedBoostHelper;
+            execution.FinalPositionInfo = finalPositionInfo;
             execution.Start();
         }
 
@@ -274,11 +271,6 @@ namespace SubPhases
             MonoBehaviour.Destroy(ShipStand);
 
             Roster.SetRaycastTargets(true);
-        }
-
-        public void TryConfirmBoostPositionNetwork(string selectedBoostHelper)
-        {
-            TryConfirmBoostPosition();
         }
 
         public void TryConfirmBoostPosition(System.Action<bool> canBoostCallback = null)
@@ -314,6 +306,9 @@ namespace SubPhases
         {
             obstaclesStayDetectorBase.ReCheckCollisionsFinish();
             obstaclesStayDetectorMovementTemplate.ReCheckCollisionsFinish();
+
+            ShipPositionInfo shipPositionInfo = new ShipPositionInfo(ShipStand.transform.position, ShipStand.transform.eulerAngles);
+
             HidePlanningTemplates();
 
             if (canBoostCallback != null)
@@ -330,11 +325,11 @@ namespace SubPhases
                 obstaclesStayDetectorMovementTemplate.OverlappedAsteroidsNow
                     .Where((a) => !TheShip.ObstaclesHit.Contains(a)).ToList()
                     .ForEach(TheShip.ObstaclesHit.Add);
-                GameMode.CurrentGameMode.StartBoostExecution();
+                StartBoostExecution(shipPositionInfo);
             }
             else
             {
-                GameMode.CurrentGameMode.CancelBoost(boostProblems);
+                CancelBoost(boostProblems);
             }
         }
 
@@ -377,12 +372,12 @@ namespace SubPhases
             UpdateHelpInfo();
         }
 
-        public override bool ThisShipCanBeSelected(Ship.GenericShip ship, int mouseKeyIsPressed)
+        public override bool ThisShipCanBeSelected(GenericShip ship, int mouseKeyIsPressed)
         {
             return false;
         }
 
-        public override bool AnotherShipCanBeSelected(Ship.GenericShip anotherShip, int mouseKeyIsPressed)
+        public override bool AnotherShipCanBeSelected(GenericShip anotherShip, int mouseKeyIsPressed)
         {
             return false;
         }
@@ -393,6 +388,7 @@ namespace SubPhases
     {
         public string SelectedBoostHelper;
         public bool IsTractorBeamBoost;
+        public ShipPositionInfo FinalPositionInfo;
 
         public override void Start()
         {
@@ -439,6 +435,7 @@ namespace SubPhases
                     break;
             }
 
+            boostMovement.FinalPositionInfo = FinalPositionInfo;
             boostMovement.TheShip = TheShip;
 
             MovementTemplates.ApplyMovementRuler(TheShip, boostMovement);
@@ -449,7 +446,7 @@ namespace SubPhases
 
         public virtual void FinishBoost()
         {
-            GameMode.CurrentGameMode.FinishBoost();
+            Phases.FinishSubPhase(Phases.CurrentSubPhase.GetType());
         }
 
         public override void Next()

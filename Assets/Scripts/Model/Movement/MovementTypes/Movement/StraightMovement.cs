@@ -28,7 +28,7 @@ namespace Movement
 
         protected override float SetAnimationSpeed()
         {
-            return 5f;
+            return 10f;
         }
 
         public override void UpdateMovementExecution()
@@ -68,6 +68,32 @@ namespace Movement
 
                 result[i] = ShipStand;
             }
+
+            return result;
+        }
+
+        public override GameObject[] PlanFinalPosition()
+        {
+            GameObject[] result = new GameObject[1];
+
+            float distance = (TheShip.ShipBase.GetShipBaseDistance() + Speed * GetMovement1());
+            Vector3 position = TheShip.GetPosition();
+            position += TheShip.TransformDirection(new Vector3(0,0, distance));
+
+            GameObject prefab = (GameObject)Resources.Load(TheShip.ShipBase.TemporaryPrefabPath, typeof(GameObject));
+            GameObject ShipStand = MonoBehaviour.Instantiate(prefab, position, TheShip.GetRotation(), BoardTools.Board.GetBoard());
+            ShipStand.name = "FinalPosition" + Speed;
+
+            Renderer[] renderers = ShipStand.GetComponentsInChildren<Renderer>();
+            if (!DebugManager.DebugMovementShowTempBases)
+            {
+                foreach (var render in renderers)
+                {
+                    render.enabled = false;
+                }
+            }
+
+            result[0] = ShipStand;
 
             return result;
         }

@@ -190,13 +190,13 @@ namespace SquadBuilderNS
                 case Faction.Scum:
                     return FactionSize.Large20;
                 case Faction.Resistance:
-                    return (Mods.ModsManager.Mods[typeof(Mods.ModsList.UnreleasedContentMod)].IsOn) ? FactionSize.Medium8 : FactionSize.Medium6;
+                    return FactionSize.Medium8;
                 case Faction.FirstOrder:
-                    return (Mods.ModsManager.Mods[typeof(Mods.ModsList.UnreleasedContentMod)].IsOn) ? FactionSize.Medium6 : FactionSize.Small4;
+                    return FactionSize.Medium6;
                 case Faction.Republic:
-                    return (Mods.ModsManager.Mods[typeof(Mods.ModsList.UnreleasedContentMod)].IsOn) ? FactionSize.Medium6 : FactionSize.Small4;
+                    return FactionSize.Medium6;
                 case Faction.Separatists:
-                    return (Mods.ModsManager.Mods[typeof(Mods.ModsList.UnreleasedContentMod)].IsOn) ? FactionSize.Medium6 : FactionSize.Small4;
+                    return FactionSize.Medium6;
                 default:
                     return FactionSize.Large20;
             }
@@ -274,7 +274,7 @@ namespace SquadBuilderNS
 
         public static void PilotSelectedIsClicked(GenericShip ship)
         {
-            AddPilotToSquad(ship, CurrentPlayer);
+            AddPilotToSquad(ship, CurrentPlayer, isFromUi: true);
             MainMenu.CurrentMainMenu.ChangePanel("SquadBuilderPanel");
         }
 
@@ -738,7 +738,7 @@ namespace SquadBuilderNS
             Transform contentTransform = GameObject.Find("UI/Panels/SelectUpgradePanel/Panel/Scroll View/Viewport/Content").transform;
             GameObject newUpgradePanel = MonoBehaviour.Instantiate(prefab, contentTransform);
 
-            string upgradeType = AllUpgrades.Find(n => n.UpgradeName == upgrade.UpgradeName && n.UpgradeType == upgrade.UpgradeType).UpgradeTypeName;
+            string upgradeType = AllUpgrades.Find(n => n.UpgradeNameCanonical == upgrade.UpgradeNameCanonical && n.UpgradeType == upgrade.UpgradeType).UpgradeTypeName;
             GenericUpgrade newUpgrade = (upgrade.UpgradeType == UpgradeType.PilotAbility) ?
                 new PilotAbility(upgrade.Instance.UpgradeInfo) :
                 (GenericUpgrade)System.Activator.CreateInstance(Type.GetType(upgradeType));
@@ -818,7 +818,7 @@ namespace SquadBuilderNS
                 string content = File.ReadAllText(filePath);
                 JSONObject squadJson = new JSONObject(content);
 
-                if (CurrentSquadList.SquadFaction == Faction.None || XWSToFaction(squadJson["faction"].str) == CurrentSquadList.SquadFaction)
+                if (CurrentSquadList.SquadFaction == Faction.None || Edition.Current.XwsToFaction(squadJson["faction"].str) == CurrentSquadList.SquadFaction)
                 {
                     squadJson.AddField("filename", new FileInfo(filePath).Name);
                     savedSquadsJsons.Add(squadJson);
@@ -853,7 +853,15 @@ namespace SquadBuilderNS
 
                 Text descriptionText = SquadListRecord.transform.Find("Description").GetComponent<Text>();
                 RectTransform descriptionRectTransform = SquadListRecord.transform.Find("Description").GetComponent<RectTransform>();
-                descriptionText.text = squadList["description"].str.Replace("\\\"", "\"");
+                if (squadList.HasField("description"))
+                {
+                    descriptionText.text = squadList["description"].str.Replace("\\\"", "\"");
+                }
+                else
+                {
+                    descriptionText.text = "No description";
+                }
+                
                 float descriptionPreferredHeight = descriptionText.preferredHeight;
                 descriptionRectTransform.sizeDelta = new Vector2(descriptionRectTransform.sizeDelta.x, descriptionPreferredHeight);
 
@@ -947,7 +955,7 @@ namespace SquadBuilderNS
             GameObject.Find("UI/Panels/SaveSquadronPanel/Panel/Name/InputField").GetComponent<InputField>().text = CurrentSquadList.Name;
         }
 
-        public static void SaveSquadron(SquadList squadList, string squadName, Action callback)
+        public static void SaveSquadronToFile(SquadList squadList, string squadName, Action callback)
         {
             squadList.Name = CleanFileName(squadName);
 
@@ -1006,14 +1014,7 @@ namespace SquadBuilderNS
         // NOT USED
         private static bool IsGenerationOfSquadsRequired()
         {
-            string directoryPath = Application.persistentDataPath + "/" + Edition.Current.Name + "/RandomAiSquadrons/";
-
-            foreach (var squadName in Edition.Current.PreGeneratedAiSquadrons.Keys)
-            {
-                if (!File.Exists(directoryPath + squadName + ".json")) return true;
-            }
-
-            return false;
+            return true;
         }
 
         private static void CreatePreGeneratedRandomAiSquads()
@@ -1064,10 +1065,10 @@ namespace SquadBuilderNS
         {
             GenericShip ship = (MainMenu.CurrentMainMenu.PreviousPanelName == "SelectPilotPanel") ? AllShips.Find(n => n.ShipName == CurrentShip).Instance : CurrentSquadBuilderShip.Instance;
 
-            Text shipNameText = GameObject.Find("UI/Panels/ShipInfoPanel/Content/LargerPanel/ShipTypeText").GetComponent<Text>();
+            Text shipNameText = GameObject.Find("UI/Panels/ShipInfoPanel/Content/TopPanel/ShipTypeText").GetComponent<Text>();
             shipNameText.text = ship.ShipInfo.ShipName;
 
-            Text sizeText = GameObject.Find("UI/Panels/ShipInfoPanel/Content/LargerPanel/ShipSizeText").GetComponent<Text>();
+            Text sizeText = GameObject.Find("UI/Panels/ShipInfoPanel/Content/TopPanel/ShipSizeText").GetComponent<Text>();
             switch (ship.ShipInfo.BaseSize)
             {
                 case BaseSize.Small:
@@ -1083,8 +1084,17 @@ namespace SquadBuilderNS
                     break;
             }
 
-            Text descriptionText = GameObject.Find("UI/Panels/ShipInfoPanel/Content/LargerPanel/ShipDescriptionText").GetComponent<Text>();
-            descriptionText.text = ship.ShipInfo.Description;
+            Transform parentTransform = GameObject.Find("UI/Panels").transform
+                .Find("ShipInfoPanel")
+                .Find("Content")
+                .Find("CenterPanel");
+
+            GameObject oldDial = parentTransform.Find("ManeuversDialView")?.gameObject;
+            if (oldDial != null) GameObject.Destroy(oldDial);
+
+            GameObject dial = GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/ManeuversDial/ManeuversDialView"), parentTransform);
+            dial.name = "ManeuversDialView";
+            dial.GetComponent<ManeuversDialView>().Initialize(ship.DialInfo.PrintedDial, isDisabled: true);
         }
 
         private static void ShowLoadingContentStub(string panelType)

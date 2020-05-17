@@ -8,6 +8,7 @@ using System.Linq;
 using SubPhases;
 using System;
 using GameCommands;
+using Movement;
 
 public class ShipMovementScript : MonoBehaviour {
 
@@ -59,15 +60,19 @@ public class ShipMovementScript : MonoBehaviour {
 
     //Assignment and launch of execution of meneuver
 
-    public static void SendAssignManeuverCommand(int shipId, string maneuverCode)
+    public static void SendAssignManeuverCommand(string maneuverCode)
     {
         JSONObject parameters = new JSONObject();
-        parameters.AddField("id", shipId.ToString());
+        parameters.AddField("id", Selection.ThisShip.ShipId.ToString());
         parameters.AddField("maneuver", maneuverCode);
-        GameController.SendCommand(
-            GameCommandTypes.AssignManeuver,
-            Phases.CurrentSubPhase.GetType(),
-            parameters.ToString()
+
+        GameMode.CurrentGameMode.ExecuteCommand(
+            GameController.GenerateGameCommand
+            (
+                GameCommandTypes.AssignManeuver,
+                Phases.CurrentSubPhase.GetType(),
+                parameters.ToString()
+            )
         );
     }
 
@@ -93,54 +98,60 @@ public class ShipMovementScript : MonoBehaviour {
 
         if (movementStruct.Bearing == Movement.ManeuverBearing.Straight)
         {
-            result = new Movement.StraightMovement(movementStruct.SpeedInt, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
+            result = new Movement.StraightMovement(movementStruct.SpeedIntUnsigned, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
         }
         else if (movementStruct.Bearing == Movement.ManeuverBearing.KoiogranTurn)
         {
-            result = new Movement.KoiogranTurnMovement(movementStruct.SpeedInt, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
+            result = new Movement.KoiogranTurnMovement(movementStruct.SpeedIntUnsigned, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
         }
         else if (movementStruct.Bearing == Movement.ManeuverBearing.Turn)
         {
-            result = new Movement.TurnMovement(movementStruct.SpeedInt, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
+            result = new Movement.TurnMovement(movementStruct.SpeedIntUnsigned, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
         }
         else if (movementStruct.Bearing == Movement.ManeuverBearing.Bank)
         {
-            result = new Movement.BankMovement(movementStruct.SpeedInt, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
+            result = new Movement.BankMovement(movementStruct.SpeedIntUnsigned, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
         }
         else if (movementStruct.Bearing == Movement.ManeuverBearing.SegnorsLoop)
         {
-            result = new Movement.SegnorsLoopMovement(movementStruct.SpeedInt, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
+            result = new Movement.SegnorsLoopMovement(movementStruct.SpeedIntUnsigned, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
         }
         else if (movementStruct.Bearing == Movement.ManeuverBearing.SegnorsLoopUsingTurnTemplate)
         {
-            result = new Movement.SegnorsLoopUsingTurnTemplateMovement(movementStruct.SpeedInt, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
+            result = new Movement.SegnorsLoopUsingTurnTemplateMovement(movementStruct.SpeedIntUnsigned, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
         }
         else if (movementStruct.Bearing == Movement.ManeuverBearing.TallonRoll)
         {
-            result = new Movement.TallonRollMovement(movementStruct.SpeedInt, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
+            result = new Movement.TallonRollMovement(movementStruct.SpeedIntUnsigned, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
         }
         else if (movementStruct.Bearing == Movement.ManeuverBearing.Stationary)
         {
-            result = new Movement.StationaryMovement(movementStruct.SpeedInt, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
+            result = new Movement.StationaryMovement(movementStruct.SpeedIntUnsigned, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
         }
         else if (movementStruct.Bearing == Movement.ManeuverBearing.ReverseStraight)
         {
             if (movementStruct.Direction == Movement.ManeuverDirection.Forward)
             {
-                result = new Movement.ReverseStraightMovement(movementStruct.SpeedInt, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
+                result = new Movement.ReverseStraightMovement(movementStruct.SpeedIntUnsigned, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
             }
             else
             {
-                result = new Movement.ReverseBankMovement(movementStruct.SpeedInt, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
+                result = new Movement.ReverseBankMovement(movementStruct.SpeedIntUnsigned, movementStruct.Direction, movementStruct.Bearing, movementStruct.ColorComplexity);
             }
         }
 
         return result;
     }
 
-    public static Movement.GenericMovement MovementFromString(string parameters, Ship.GenericShip ship = null)
+    public static GenericMovement CopyMovement(GenericMovement maneuver)
     {
-        Movement.ManeuverHolder movementStruct = new Movement.ManeuverHolder(parameters, ship);
+        ManeuverHolder movementStruct = new ManeuverHolder(maneuver.ManeuverSpeed, maneuver.Direction, maneuver.Bearing, maneuver.ColorComplexity);
+        return MovementFromStruct(movementStruct);
+    }
+
+    public static GenericMovement MovementFromString(string parameters, GenericShip ship = null)
+    {
+        ManeuverHolder movementStruct = new ManeuverHolder(parameters, ship);
         return MovementFromStruct(movementStruct);
     }
 
@@ -163,7 +174,14 @@ public class ShipMovementScript : MonoBehaviour {
 
         UI.HideContextMenu();
 
-        Selection.ThisShip.CallMovementActivationStart(ReadyRoRevealManeuver);
+        if (!DebugManager.DebugStraightToCombat)
+        {
+            Selection.ThisShip.CallMovementActivationStart(ReadyRoRevealManeuver);
+        }
+        else
+        {
+            FinishMovementAndStartActionDecision();
+        }
     }
 
     private static void ReadyRoRevealManeuver()

@@ -19,6 +19,7 @@ namespace Ship
 
                 ShipInfo.UpgradeIcons.Upgrades.Add(UpgradeType.Cannon);
                 ShipInfo.UpgradeIcons.Upgrades.Remove(UpgradeType.Torpedo);
+                ShipInfo.UpgradeIcons.Upgrades.Add(UpgradeType.Configuration);
 
                 ShipInfo.ActionIcons.AddLinkedAction(new LinkedActionInfo(typeof(FocusAction), typeof(BarrelRollAction)));
 
@@ -29,8 +30,6 @@ namespace Ship
                 IconicPilots[Faction.Rebel] = typeof(BraylenStramm);
 
                 ManeuversImageUrl = "https://vignette.wikia.nocookie.net/xwing-miniatures-second-edition/images/f/ff/Maneuver_b-wing.png";
-
-                OldShipTypeName = "B-wing";
             }
         }
     }

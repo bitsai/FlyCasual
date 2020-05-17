@@ -11,10 +11,12 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Skull Squadron Pilot",
                     4,
-                    50,
+                    47,
                     extraUpgradeIcon: UpgradeType.Talent,
                     seImageNumber: 159
                 );
+
+                ModelInfo.SkinName = "Skull Squadron";
             }
         }
     }

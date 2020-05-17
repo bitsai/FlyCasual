@@ -5,6 +5,7 @@ using System;
 using Editions;
 using Obstacles;
 using Remote;
+using Ship;
 
 namespace Movement
 { 
@@ -52,6 +53,9 @@ namespace Movement
         public bool IsSimple;
 
         public int RotationEndDegrees = 0;
+
+        //Only for boosts
+        public ShipPositionInfo FinalPositionInfo;
 
         public GenericMovement(int speed, ManeuverDirection direction, ManeuverBearing bearing, MovementComplexity color)
         {
@@ -120,6 +124,7 @@ namespace Movement
                 Rules.Collision.AddBump(TheShip, shipBumped);
             }
 
+            TheShip.RemotesMovedThrough = new List<GenericRemote>(movementPrediction.RemotesMovedThrough);
             TheShip.RemotesOverlapped = new List<GenericRemote>(movementPrediction.RemotesOverlapped);
             TheShip.ObstaclesLanded = new List<GenericObstacle>(movementPrediction.LandedOnObstacles);
 
@@ -180,6 +185,9 @@ namespace Movement
             // TODO: Use Selection.ActiveShip instead of TheShip
             Selection.ActiveShip = TheShip;
 
+            // Important! Fixes final position according to prediction - otherwise animation can cause another final position
+            TheShip.SetPositionInfo(FinalPositionInfo);
+
             ManeuverEndRotation(FinishManeuverExecution);
         }
 
@@ -203,6 +211,7 @@ namespace Movement
         }
 
         public abstract GameObject[] PlanMovement();
+        public abstract GameObject[] PlanFinalPosition();
 
         public override string ToString()
         {

@@ -6,6 +6,7 @@ namespace Ship
 {
     public partial class GenericShip
     {
+        public virtual bool HasCombatActivation { get { return !IsAttackPerformed; } }
         public bool IsSetupPerformed { get; set; }
         public bool IsManeuverPerformed { get; set; }
         public bool IsAttackPerformed { get; set; }
@@ -18,7 +19,6 @@ namespace Ship
 
         public bool IsFreeActionSkipped { get; set; }
 
-        public bool CanPerformActionsWhileStressed { get; set; }
         public bool CanPerformActionsWhenBumped { get; set; }
         public bool CanPerformActionsWhenOverlapping { get; set; }
         public bool CanBeCoordinated

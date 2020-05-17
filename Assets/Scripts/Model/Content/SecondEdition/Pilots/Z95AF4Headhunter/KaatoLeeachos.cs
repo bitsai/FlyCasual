@@ -16,7 +16,7 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Ka'ato Leeachos",
                     3,
-                    29,
+                    27,
                     isLimited: true,
                     abilityType: typeof(Abilities.SecondEdition.KaatoLeeachosAbility),
                     extraUpgradeIcons: new List<UpgradeType>() { UpgradeType.Talent, UpgradeType.Illicit },
@@ -107,7 +107,7 @@ namespace Abilities.SecondEdition
 
             public override void PrepareDecision(Action callBack)
             {
-                DescriptionShort = "Ka'ato Leeachos";
+                DescriptionShort = HostShip.PilotInfo.PilotName;
                 DescriptionLong = TargetShip.PilotInfo.PilotName + ": " + "Select token to transfer to Kaato.";
                 ImageSource = HostShip;
 

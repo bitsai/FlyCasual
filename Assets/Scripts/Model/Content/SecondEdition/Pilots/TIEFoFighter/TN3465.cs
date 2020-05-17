@@ -13,7 +13,7 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "TN-3465",
                     2,
-                    29,
+                    28,
                     isLimited: true,
                     abilityType: typeof(Abilities.SecondEdition.TN3465Ability)
                 );
@@ -31,7 +31,7 @@ namespace Abilities.SecondEdition
         public override void ActivateAbility()
         {
             AddDiceModification(
-                "TN-3465",
+                HostShip.PilotInfo.PilotName,
                 IsDiceModificationAvailable,
                 GetDiceModificationAiPriority,
                 DiceModificationType.Change,

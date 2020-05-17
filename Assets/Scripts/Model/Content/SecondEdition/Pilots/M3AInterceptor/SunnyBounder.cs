@@ -12,7 +12,7 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Sunny Bounder",
                     1,
-                    30,
+                    27,
                     isLimited: true,
                     abilityType: typeof(Abilities.SecondEdition.SunnyBounderAbility),
                     seImageNumber: 188
@@ -31,7 +31,9 @@ namespace Abilities.SecondEdition
         {
             if (Combat.CurrentDiceRoll.DiceList.All(die => die.Side == Combat.CurrentDiceRoll.DiceList.First().Side))
             {
-                HostShip.AddAvailableDiceModification(new ActionsList.FirstEdition.SunnyBounderAbilityAction(() => { IsAbilityUsed = true; }));
+                HostShip.AddAvailableDiceModificationOwn(
+                    new ActionsList.FirstEdition.SunnyBounderAbilityAction(() => { IsAbilityUsed = true; HostShip = HostShip; })
+                );
             }
         }
     }

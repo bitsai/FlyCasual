@@ -18,7 +18,7 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Latts Razzi",
                     3,
-                    59,
+                    57,
                     isLimited: true,
                     abilityType: typeof(Abilities.SecondEdition.LattsRazziPilotAbility),
                     extraUpgradeIcon: UpgradeType.Talent,
@@ -82,7 +82,7 @@ namespace Abilities.SecondEdition
         {
             SelectShipSubPhase.FinishSelectionNoCallback();
 
-            Messages.ShowInfo("Latts Razzi causes " + TargetShip.PilotInfo.PilotName + " to gain a Tractor Beam token");
+            Messages.ShowInfo(HostShip.PilotInfo.PilotName + " causes " + TargetShip.PilotInfo.PilotName + " to gain a Tractor Beam token");
 
             List<char> tlLetter = ActionsHolder.GetTargetLocksLetterPairs(HostShip, TargetShip);
             HostShip.Tokens.SpendToken(typeof(BlueTargetLockToken), ApplyAbility, tlLetter.First());

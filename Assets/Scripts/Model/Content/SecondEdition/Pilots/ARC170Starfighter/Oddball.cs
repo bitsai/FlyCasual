@@ -13,12 +13,14 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "\"Odd Ball\"",
                     5,
-                    52,
+                    51,
                     isLimited: true,
                     factionOverride: Faction.Republic,
                     abilityType: typeof(Abilities.SecondEdition.OddBallAbility),
                     extraUpgradeIcon: UpgradeType.Talent
                 );
+
+                PilotNameCanonical = "oddball-arc170starfighter";
 
                 ModelInfo.SkinName = "Red";
 

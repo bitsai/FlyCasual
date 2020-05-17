@@ -28,7 +28,17 @@ namespace UpgradesList.SecondEdition
 namespace Abilities.SecondEdition
 {
     public class AgentKallusAbility : FirstEdition.AgentKallusAbility
-    {        
+    {
+        public override void ActivateAbility()
+        {
+            Phases.Events.OnSetupEnd += RegisterAgentKallusAbility;
+        }
+
+        public override void DeactivateAbility()
+        {
+            Phases.Events.OnSetupEnd -= RegisterAgentKallusAbility;
+        }
+
         protected override void SelectTarget(GenericShip targetShip)
         {
             Messages.ShowInfo("Agent Kallus is hunting " + targetShip.PilotInfo.PilotName + " (" + targetShip.ShipId + ")");
@@ -48,7 +58,7 @@ namespace Abilities.SecondEdition
                 ImageUrl = HostUpgrade.ImageUrl,
                 HostShip = host
             };
-            host.AddAvailableDiceModification(newAction);
+            host.AddAvailableDiceModificationOwn(newAction);
         }
     }
 }

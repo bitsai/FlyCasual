@@ -4,7 +4,9 @@ using UnityEngine;
 
 public static class DebugManager
 {
-    public static bool ReleaseVersion;
+    public static bool ReleaseVersion = false;
+
+    public static bool DebugNetworkSingleDevice; // = true;
 
     public static bool NoCinematicCamera;
 
@@ -17,16 +19,19 @@ public static class DebugManager
     public static bool DebugNoSquadPointsLimit;
 
     public static bool DebugNoCombat;
+    public static bool DebugStraightToCombat;
 
     public static bool NoObstaclesSetup;
-
-    public static bool NoReplayCreation; // = true;
 
     public static bool DebugMovementShowTempBases; // = true;
     public static bool DebugMovementDestroyTempBasesLater; // = true;
     public static bool DebugMovementShowPlanning; // = true;
 
     public static bool FreeMode;
+
+    public static bool ManualCollisionPrediction;
+
+    public static bool DebugAiNavigation; // = true;
 
     public static bool ErrorIsAlreadyReported { get; set; }
 

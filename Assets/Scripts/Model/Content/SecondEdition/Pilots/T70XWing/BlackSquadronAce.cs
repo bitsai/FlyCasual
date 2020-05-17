@@ -13,10 +13,12 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Black Squadron Ace",
                     4,
-                    49,
+                    47,
                     extraUpgradeIcon: UpgradeType.Talent //,
                     //seImageNumber: 11
                 );
+
+                PilotNameCanonical = "blacksquadronace-t70xwing";
 
                 ModelInfo.SkinName = "Black One";
 

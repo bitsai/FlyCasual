@@ -28,7 +28,7 @@ namespace Movement
 
         protected override float SetAnimationSpeed()
         {
-            return 1;
+            return 1f;
         }
 
         public override GameObject[] PlanMovement()
@@ -49,6 +49,11 @@ namespace Movement
             result[0] = ShipStand;
 
             return result;
+        }
+
+        public override GameObject[] PlanFinalPosition()
+        {
+            return PlanMovement();
         }
 
         public override void AdaptSuccessProgress() { }

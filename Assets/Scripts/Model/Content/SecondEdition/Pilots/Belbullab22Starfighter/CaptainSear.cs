@@ -15,7 +15,7 @@ namespace Ship.SecondEdition.Belbullab22Starfighter
             PilotInfo = new PilotCardInfo(
                 "Captain Sear",
                 2,
-                39,
+                45,
                 true,
                 abilityType: typeof(Abilities.SecondEdition.CaptainSearAbility),
                 pilotTitle: "Kage Infiltrator"
@@ -51,7 +51,7 @@ namespace Abilities.SecondEdition
                 CaptainSearShip = HostShip
 
             };
-            ship.AddAvailableDiceModification(newAction);
+            ship.AddAvailableDiceModificationOwn(newAction);
         }
 
         private class CaptainSearDiceModification : GenericAction

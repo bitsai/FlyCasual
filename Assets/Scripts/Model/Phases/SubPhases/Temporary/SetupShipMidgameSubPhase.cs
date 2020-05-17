@@ -7,6 +7,7 @@ using BoardTools;
 using GameModes;
 using GameCommands;
 using System;
+using System.Globalization;
 
 namespace SubPhases
 {
@@ -50,12 +51,29 @@ namespace SubPhases
 
             Board.ToggleOffTheBoardHolder(false);
 
-            Board.SetShipPreSetup(ShipToSetup);
+            Board.SetShipPreSetup(ShipToSetup, 1, GetDefaulRotationForSetupSide());
 
             Roster.HighlightShipsFiltered(FilterShipsToSetup);
 
             IsReadyForCommands = true;
             Roster.GetPlayer(RequiredPlayer).SetupShipMidgame();
+        }
+
+        private float GetDefaulRotationForSetupSide()
+        {
+            switch (SetupSide)
+            {
+                case Direction.Bottom:
+                    return 0;
+                case Direction.Left:
+                    return 90;
+                case Direction.Top:
+                    return 180;
+                case Direction.Right:
+                    return 270;
+                default:
+                    return 0;
+            }
         }
 
         public void ShowDescription()
@@ -94,9 +112,17 @@ namespace SubPhases
         public static GameCommand GeneratePlaceShipCommand(int shipId, Vector3 position, Vector3 angles)
         {
             JSONObject parameters = new JSONObject();
+
             parameters.AddField("id", shipId.ToString());
-            parameters.AddField("positionX", position.x.ToString()); parameters.AddField("positionY", position.y.ToString()); parameters.AddField("positionZ", position.z.ToString());
-            parameters.AddField("rotationX", angles.x.ToString()); parameters.AddField("rotationY", angles.y.ToString()); parameters.AddField("rotationZ", angles.z.ToString());
+
+            parameters.AddField("positionX", position.x.ToString(CultureInfo.InvariantCulture));
+            parameters.AddField("positionY", position.y.ToString(CultureInfo.InvariantCulture));
+            parameters.AddField("positionZ", position.z.ToString(CultureInfo.InvariantCulture));
+
+            parameters.AddField("rotationX", angles.x.ToString(CultureInfo.InvariantCulture));
+            parameters.AddField("rotationY", angles.y.ToString(CultureInfo.InvariantCulture));
+            parameters.AddField("rotationZ", angles.z.ToString(CultureInfo.InvariantCulture));
+
             return GameController.GenerateGameCommand(
                 GameCommandTypes.ShipPlacement,
                 typeof(SetupShipMidgameSubPhase),

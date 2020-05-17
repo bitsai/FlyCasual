@@ -18,7 +18,7 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "K-2SO",
                     3,
-                    47,
+                    46,
                     isLimited: true,
                     abilityType: typeof(K2SOPilotAbility),
                     extraUpgradeIcon: UpgradeType.Talent
@@ -27,8 +27,6 @@ namespace Ship
                 ShipInfo.ActionIcons.SwitchToDroidActions();
 
                 ImageUrl = "https://images-cdn.fantasyflightgames.com/filer_public/56/cb/56cb9ec8-0eff-4c6f-acda-f54413baadc7/swz66_k-2so.png";
-
-                RequiredMods = new List<Type>() { typeof(Mods.ModsList.UnreleasedContentMod) };
             }
         }
     }
@@ -40,15 +38,15 @@ namespace Abilities.SecondEdition
     {
         public override void ActivateAbility()
         {
-            HostShip.OnTokenIsAssigned += RegisterSoontirFelAbility;
+            HostShip.OnTokenIsAssigned += RegisterK2SOAbility;
         }
 
         public override void DeactivateAbility()
         {
-            HostShip.OnTokenIsAssigned -= RegisterSoontirFelAbility;
+            HostShip.OnTokenIsAssigned -= RegisterK2SOAbility;
         }
 
-        private void RegisterSoontirFelAbility(GenericShip ship, Type tokenType)
+        private void RegisterK2SOAbility(GenericShip ship, Type tokenType)
         {
             if (tokenType == typeof(StressToken))
             {
@@ -58,7 +56,7 @@ namespace Abilities.SecondEdition
 
         private void AssignToken(object sender, EventArgs e)
         {
-            Messages.ShowInfo("K-2SO: Calculate Token is assigned");
+            Messages.ShowInfo(HostShip.PilotInfo.PilotName + ": Calculate Token is assigned");
             HostShip.Tokens.AssignToken(typeof(CalculateToken), Triggers.FinishTrigger);
         }
     }

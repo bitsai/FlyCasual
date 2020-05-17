@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Arcs;
+using Players;
 using Ship;
 using UnityEngine;
 
@@ -65,10 +66,10 @@ namespace BoardTools
 
         private static void SetPlaymat(string playmatName)
         {
-            LoadSceneFromResources("TableClassic");
+            LoadSceneFromResources("SpaceStationScene");
 
             Texture playmatTexture = (Texture)Resources.Load("Playmats/Playmat" + Options.Playmat + "Texture", typeof(Texture));
-            GameObject.Find("SceneHolder/TableClassic/Playmat").GetComponent<Renderer>().material.mainTexture = playmatTexture;
+            GameObject.Find("SceneHolder/SpaceStationScene/TableClassic/Playmat").GetComponent<Renderer>().material.mainTexture = playmatTexture;
 
             RenderSettings.fog = false;
         }
@@ -96,7 +97,7 @@ namespace BoardTools
             DynamicGI.UpdateEnvironment();
         }
 
-        public static void SetShipPreSetup(GenericShip ship, int count = 1)
+        public static void SetShipPreSetup(GenericShip ship, int count = 1, float? rotation = null)
         {
             float distance = CalculateDistance(ship.Owner.Ships.Count);
             float side = (ship.Owner.PlayerNo == Players.PlayerNo.Player1) ? -1 : 1;
@@ -111,10 +112,12 @@ namespace BoardTools
                 )
             );
 
+            if (rotation == null) rotation = (ship.Owner.PlayerNo == Players.PlayerNo.Player1) ? 0 : 180;
+
             ship.SetAngles(
                 new Vector3(
                     ship.GetAngles().x,
-                    (ship.Owner.PlayerNo == Players.PlayerNo.Player1) ? 0 : 180,
+                    rotation.Value,
                     ship.GetAngles().z
                 )
             );
@@ -393,6 +396,19 @@ namespace BoardTools
         public static void ToggleOffTheBoardHolder(bool isActive)
         {
             BoardTransform.Find("OffTheBoardHolder").gameObject.SetActive(isActive);
+        }
+
+        public static void HighlightOfStartingZoneOn()
+        {
+            if (Roster.GetPlayer(Phases.CurrentSubPhase.RequiredPlayer) is HumanPlayer)
+            {
+                GameObject.Find("SceneHolder").transform.Find("Board").Find("ObstaclesZone").Find("ObstaclesZoneHighlight").gameObject.SetActive(true);
+            }
+        }
+
+        public static void HighlightOfStartingZoneOff()
+        {
+            GameObject.Find("SceneHolder").transform.Find("Board").Find("ObstaclesZone").Find("ObstaclesZoneHighlight").gameObject.SetActive(false);
         }
     }
 }

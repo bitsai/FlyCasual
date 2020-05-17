@@ -15,7 +15,7 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Han Solo",
                     6,
-                    82,
+                    80,
                     isLimited: true,
                     abilityType: typeof(Abilities.SecondEdition.HanSoloRebelPilotAbility),
                     charges: 1,
@@ -23,6 +23,8 @@ namespace Ship
                     extraUpgradeIcon: UpgradeType.Talent,
                     seImageNumber: 69
                 );
+
+                PilotNameCanonical = "hansolo-modifiedyt1300lightfreighter";
             }
         }
     }

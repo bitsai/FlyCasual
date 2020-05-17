@@ -39,6 +39,18 @@ namespace Upgrade
                 {
                     weaponType = WeaponTypes.Turret;
                 }
+                else if (UpgradeInfo.HasType(UpgradeType.Illicit))
+                {
+                    weaponType = WeaponTypes.Illicit;
+                }
+                else if (UpgradeInfo.HasType(UpgradeType.Talent))
+                {
+                    weaponType = WeaponTypes.Talent;
+                }
+                else if (UpgradeInfo.HasType(UpgradeType.ForcePower))
+                {
+                    weaponType = WeaponTypes.Force;
+                }
 
                 return weaponType;
             }

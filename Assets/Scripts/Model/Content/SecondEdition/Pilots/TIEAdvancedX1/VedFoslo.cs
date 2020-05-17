@@ -15,7 +15,7 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Ved Foslo",
                     4,
-                    45,
+                    44,
                     isLimited: true,
                     abilityType: typeof(Abilities.SecondEdition.VedFosloAbility),
                     extraUpgradeIcon: UpgradeType.Talent,
@@ -58,10 +58,17 @@ namespace Abilities.SecondEdition
                 defaultManeuvers = new Dictionary<string, MovementComplexity>(HostShip.Maneuvers);
             }
             abilityManeuvers = new Dictionary<string, MovementComplexity>(HostShip.Maneuvers);
-            abilityManeuvers["1.F.S"] = MovementComplexity.Easy;
             abilityManeuvers["1.L.T"] = MovementComplexity.Normal;
             abilityManeuvers["1.R.T"] = MovementComplexity.Normal;
             abilityManeuvers["3.F.R"] = MovementComplexity.Complex;
+            if (HostShip.AssignedManeuver.ToString().Equals("1.F.S"))
+            {
+                abilityManeuvers["2.F.S"] = MovementComplexity.Normal;
+            }
+            else
+            {
+                abilityManeuvers["1.F.S"] = MovementComplexity.Easy;
+            }
             if (HostShip.AssignedManeuver.ToString().Equals("3.F.S")) {
                 abilityManeuvers["4.F.S"] = MovementComplexity.Easy;
             }
@@ -84,7 +91,7 @@ namespace Abilities.SecondEdition
         {
             SetAbilityManeuvers();
             HostShip.OnMovementExecuted += CleanUpMovements;
-            HostShip.Owner.ChangeManeuver(GameMode.CurrentGameMode.AssignManeuver, Triggers.FinishTrigger, IsManeuverSameBearing);
+            HostShip.Owner.ChangeManeuver(ShipMovementScript.SendAssignManeuverCommand, Triggers.FinishTrigger, IsManeuverSameBearing);
         }
 
         private bool IsManeuverSameBearing(string maneuverString)

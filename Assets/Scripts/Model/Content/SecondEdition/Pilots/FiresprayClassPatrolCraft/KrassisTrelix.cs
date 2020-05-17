@@ -13,7 +13,7 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Krassis Trelix",
                     3,
-                    68,
+                    65,
                     isLimited: true,
                     abilityType: typeof(Abilities.SecondEdition.KrassisTrelixAbility),
                     extraUpgradeIcon: UpgradeType.Talent,
@@ -35,7 +35,7 @@ namespace Abilities.SecondEdition
             HostShip.OnGameStart += ChangeSpecialWeaponsRestrictions;
 
             AddDiceModification(
-                "Krassis Trelix",
+                HostShip.PilotInfo.PilotName,
                 IsDiceModificationAvailable,
                 GetAiPriority,
                 DiceModificationType.Reroll,

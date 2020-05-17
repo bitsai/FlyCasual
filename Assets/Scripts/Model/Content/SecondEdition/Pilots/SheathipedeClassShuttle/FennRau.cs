@@ -13,12 +13,14 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Fenn Rau",
                     6,
-                    52,
+                    50,
                     isLimited: true,
                     abilityType: typeof(Abilities.FirstEdition.FennRauRebelAbility),
                     extraUpgradeIcon: UpgradeType.Talent,
                     seImageNumber: 38
                 );
+
+                PilotNameCanonical = "fennrau-sheathipedeclassshuttle";
             }
         }
     }

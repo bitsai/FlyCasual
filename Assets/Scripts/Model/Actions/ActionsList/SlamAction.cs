@@ -9,6 +9,7 @@ namespace ActionsList
 
     public class SlamAction : GenericAction
     {
+        private bool canBePerformedAsFreeAction = false;
 
         public SlamAction()
         {
@@ -16,11 +17,17 @@ namespace ActionsList
             ImageUrl = "https://raw.githubusercontent.com/guidokessels/xwing-data/master/images/reference-cards/SlamAction.png";
         }
 
+        public SlamAction(bool canBePerformedAsFreeAction) : this()
+        {
+            this.canBePerformedAsFreeAction = canBePerformedAsFreeAction;
+        }
+
+
         public override bool CanBePerformedAsAFreeAction
         {
             get
             {
-                return false;
+                return canBePerformedAsFreeAction;
             }
         }
 
@@ -34,7 +41,7 @@ namespace ActionsList
             {
                 Phases.CurrentSubPhase.Pause();
 
-                Selection.ThisShip.Owner.SelectManeuver(GameMode.CurrentGameMode.AssignManeuver, ExecuteSelectedManeuver, IsSameSpeed);
+                Selection.ThisShip.Owner.SelectManeuver(ShipMovementScript.SendAssignManeuverCommand, ExecuteSelectedManeuver, IsSameSpeed);
             }
         }
 

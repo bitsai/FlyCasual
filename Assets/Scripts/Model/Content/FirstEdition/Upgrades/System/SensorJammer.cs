@@ -9,7 +9,7 @@ namespace UpgradesList.FirstEdition
         {
             UpgradeInfo = new UpgradeCardInfo(
                 "Sensor Jammer",
-                UpgradeType.System,
+                UpgradeType.Sensor,
                 cost: 4,
                 abilityType: typeof(Abilities.FirstEdition.SensorJammerAbility)
             );
@@ -38,7 +38,7 @@ namespace Abilities.FirstEdition
                 ImageUrl = HostUpgrade.ImageUrl,
                 HostShip = host
             };
-            host.AddAvailableDiceModification(newAction);
+            host.AddAvailableDiceModificationOwn(newAction);
         }
     }
 }

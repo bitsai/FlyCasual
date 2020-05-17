@@ -72,7 +72,7 @@ namespace Abilities.SecondEdition
             HostShip.Owner.ChangeManeuver(
                 (maneuverCode) => { 
                     Messages.ShowInfo(HostUpgrade.UpgradeInfo.Name + ": Maneuver was changed");
-                    GameMode.CurrentGameMode.AssignManeuver(maneuverCode);
+                    ShipMovementScript.SendAssignManeuverCommand(maneuverCode);
                     HostShip.OnMovementFinish += RestoreManuvers;
                 },
                 Triggers.FinishTrigger,
@@ -113,7 +113,7 @@ namespace Abilities.SecondEdition
 
             ManeuverHolder movementStruct = new ManeuverHolder(maneuverString);
 
-            if (movementStruct.SpeedInt == Selection.ThisShip.AssignedManeuver.Speed + 1
+            if (movementStruct.SpeedIntUnsigned == Selection.ThisShip.AssignedManeuver.Speed + 1
                 && (movementStruct.Bearing == ManeuverBearing.Straight
                     || movementStruct.Bearing == ManeuverBearing.Bank
                     || movementStruct.Bearing == ManeuverBearing.Turn

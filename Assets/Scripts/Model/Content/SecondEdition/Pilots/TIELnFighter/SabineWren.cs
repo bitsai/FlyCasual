@@ -14,13 +14,15 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Sabine Wren",
                     3,
-                    30,
+                    29,
                     isLimited: true,
                     abilityType: typeof(Abilities.FirstEdition.SabineWrenPilotAbility),
                     extraUpgradeIcon: UpgradeType.Talent,
                     factionOverride: Faction.Rebel,
                     seImageNumber: 47
                 );
+
+                PilotNameCanonical = "sabinewren-tielnfighter";
 
                 ModelInfo.ModelName = "TIE Fighter Rebel";
                 ModelInfo.SkinName = "Rebel";

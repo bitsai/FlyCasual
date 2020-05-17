@@ -20,6 +20,7 @@ namespace Ship
         public GenericMovement RevealedManeuver { get; set; }
 
         public List<GenericRemote> RemotesOverlapped = new List<GenericRemote>();
+        public List<GenericRemote> RemotesMovedThrough = new List<GenericRemote>();
 
         public bool IsIgnoreObstacles;
         public bool IsIgnoreObstaclesDuringBoost;
@@ -127,7 +128,7 @@ namespace Ship
             if (AssignedManeuver != null && AssignedManeuver.IsRevealDial)
             {
                 // Make a new copy of AssignedManeuver, so changes to it doesn't affect RevealedManeuver
-                RevealedManeuver = ShipMovementScript.MovementFromString(AssignedManeuver.ToString());
+                RevealedManeuver = ShipMovementScript.CopyMovement(AssignedManeuver);
 
                 OnManeuverIsRevealed?.Invoke(this);
                 OnManeuverIsRevealedGlobal?.Invoke(this);

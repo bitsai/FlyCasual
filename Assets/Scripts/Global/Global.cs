@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Analytics;
+using UnityEngine.SceneManagement;
 
 public class Global : MonoBehaviour {
 
@@ -10,9 +11,9 @@ public class Global : MonoBehaviour {
 
     private static bool isAlreadyInitialized;
 
-    public static string CurrentVersion = "1.0.0";
-    public static int CurrentVersionInt = 101000000;
-    public static int LatestVersionInt = 101000000;
+    public static string CurrentVersion = "1.0.1";
+    public static int CurrentVersionInt = 101000101;
+    public static int LatestVersionInt = 101000101;
 
     void Awake()
     {
@@ -37,7 +38,7 @@ public class Global : MonoBehaviour {
     {
         if ((Roster.Player2 is Players.HotacAiPlayer) && (!Options.DontShowAiInfo))
         {
-            MainMenu.ShowAiInformationContinue();
+            MainMenu.ShowLoadingScreenNetworkContinue();
         }
         else
         {
@@ -57,16 +58,7 @@ public class Global : MonoBehaviour {
             });
         }
 
-        ToggelLoadingScreen(false);
-        Phases.StartPhases();
-    }
-
-    public static void ToggelLoadingScreen(bool isActive)
-    {
-        Transform loadingScreen = GameObject.Find("GlobalUI").transform.Find("OpponentSquad");
-        if (isActive) loadingScreen.GetComponent<Image>().sprite = MainMenu.GetRandomSplashScreen();
-        if (loadingScreen != null) loadingScreen.gameObject.SetActive(isActive);
-        if (isActive) MainMenu.ResetAiInformation();
+        LoadingScreen.NextSceneIsReady(Phases.StartPhases);
     }
 
     public static Scene ActiveScene
@@ -90,6 +82,19 @@ public class Global : MonoBehaviour {
         Undefined,
         MainMenu,
         Battle
+    }
+
+    public static void ReturnToMainMenu()
+    {
+        Phases.EndGame();
+        LoadingScreen.Show();
+        SceneManager.LoadScene("MainMenu");
+        LoadingScreen.NextSceneIsReady(delegate { });
+    }
+
+    public static void ShowAnotherPlayerDisconnected()
+    {
+        UI.ShowGameResults(Roster.GetOpponent().NickName + " is disconnected");
     }
 
 }

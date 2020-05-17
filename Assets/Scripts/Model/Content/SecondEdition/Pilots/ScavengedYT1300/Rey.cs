@@ -16,12 +16,11 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Rey",
                     5,
-                    73,
+                    70,
                     isLimited: true,
                     abilityType: typeof(Abilities.SecondEdition.ReyPilotAbility),
                     force: 2,
-                    extraUpgradeIcon: UpgradeType.Force //,
-                                                        //seImageNumber: 69
+                    extraUpgradeIcon: UpgradeType.ForcePower
                 );
                 ImageUrl = "https://sb-cdn.fantasyflightgames.com/card_images/en/0ee7006e6cc51d8c08b784c9b770f1b0.png";
             }
@@ -45,14 +44,15 @@ namespace Abilities.SecondEdition
 
         public void AddDiceModification(GenericShip ship)
         {
-            ship.AddAvailableDiceModification(new ReyAction(ship));
+            ship.AddAvailableDiceModificationOwn(new ReyAction(ship) { ImageUrl = HostShip.ImageUrl });
         }
 
         private class ReyAction : ActionsList.GenericAction
         {
             public ReyAction(GenericShip ship)
             {
-                Name = DiceModificationName = "Rey's Ability";
+                Name = DiceModificationName = "Rey";
+
                 TokensSpend.Add(typeof(ForceToken));
                 HostShip = ship;
             }

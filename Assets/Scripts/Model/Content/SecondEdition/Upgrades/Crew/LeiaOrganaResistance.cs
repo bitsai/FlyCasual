@@ -15,19 +15,21 @@ namespace UpgradesList.SecondEdition
         public LeiaOrganaResistance() : base()
         {
             UpgradeInfo = new UpgradeCardInfo(
-                "Leia Organa (Resistance)",
+                "Leia Organa",
                 types: new List<UpgradeType>()
                 {
                     UpgradeType.Crew,
                     UpgradeType.Crew
                 },
-                cost: 19,
+                cost: 17,
                 isLimited: true,
                 restriction: new FactionRestriction(Faction.Resistance),
                 addAction: new ActionInfo(typeof(CoordinateAction), ActionColor.Purple),
                 addForce: 1,
                 abilityType: typeof(Abilities.SecondEdition.LeiaOrganaResistanceAbility)
             );
+
+            NameCanonical = "leiaorgana-resistance";
 
             ImageUrl = "https://sb-cdn.fantasyflightgames.com/card_images/en/0a194c8c529278b471e64edc597b06fc.png";
         }        
@@ -65,7 +67,7 @@ namespace Abilities.SecondEdition
                 "Leia Organa",
                 UseIfRedOnly,
                 DecreaseComplexityOfManeuver,
-                descriptionLong: "Do you want to spen 1 Force to resuce difficuly of revealed maneuver?",
+                descriptionLong: "Do you want to spend 1 Force to reduce difficulty of revealed maneuver?",
                 imageHolder: HostUpgrade,
                 requiredPlayer: HostShip.Owner.PlayerNo
             );

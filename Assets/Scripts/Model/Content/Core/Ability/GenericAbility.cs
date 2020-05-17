@@ -42,7 +42,7 @@ namespace Abilities
         public GenericShip HostShip
         {
             get { return hostShip; }
-            private set { hostShip = value; }
+            protected set { hostShip = value; }
         }
 
         private GenericUpgrade hostUpgrade;
@@ -526,7 +526,15 @@ namespace Abilities
                     },
                     IsReroll = modificationType == DiceModificationType.Reroll,
                 };
-                ship.AddAvailableDiceModification(diceModification);
+
+                if (!isGlobal)
+                {
+                    ship.AddAvailableDiceModificationOwn(diceModification);
+                }
+                else
+                {
+                    ship.AddAvailableDiceModification(diceModification, HostShip);
+                }
             };
             
             if (!isGlobal)
@@ -677,6 +685,25 @@ namespace Abilities
 
         public void DiceModificationAdd(Action callBack, Func<int> getCount, DieSide side)
         {
+            // TODO: Replace this quick hack to real roll of a dice
+            if (side == DieSide.Unknown)
+            {
+                List<DieSide> AttackDieSides = new List<DieSide>()
+                {
+                    DieSide.Crit,
+                    DieSide.Success,
+                    DieSide.Success,
+                    DieSide.Success,
+                    DieSide.Focus,
+                    DieSide.Focus,
+                    DieSide.Blank,
+                    DieSide.Blank
+                };
+
+                int index = UnityEngine.Random.Range(0, AttackDieSides.Count);
+                side = AttackDieSides[index];
+            }
+
             for (int i = 0; i < getCount(); i++)
                 Combat.CurrentDiceRoll.AddDice(side).ShowWithoutRoll();
 

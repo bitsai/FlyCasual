@@ -14,13 +14,15 @@ namespace Ship.SecondEdition.Delta7Aethersprite
             PilotInfo = new PilotCardInfo(
                 "Ahsoka Tano",
                 3,
-                47,
+                44,
                 true,
                 force: 2,
                 abilityType: typeof(Abilities.SecondEdition.AhsokaTanoAbility),
-                extraUpgradeIcon: UpgradeType.Force,
+                extraUpgradeIcon: UpgradeType.ForcePower,
                 pilotTitle: "\"Snips\""
             );
+
+            ModelInfo.SkinName = "Ahsoka Tano";
 
             ImageUrl = "https://sb-cdn.fantasyflightgames.com/card_images/en/15f6bf84f63970c982dd722a5473217f.png";
         }
@@ -75,14 +77,17 @@ namespace Abilities.SecondEdition
             SelectShipSubPhase.FinishSelectionNoCallback();
             Selection.ThisShip = TargetShip;
 
-            var oldValue = TargetShip.CanPerformActionsWhileStressed;
-            TargetShip.CanPerformActionsWhileStressed = true;
+            TargetShip.OnCheckCanPerformActionsWhileStressed += ConfirmThatIsPossible;
+            TargetShip.OnCanPerformActionWhileStressed += AlwaysAllow;
+
             var actions = TargetShip.GetAvailableActions();
 
             TargetShip.AskPerformFreeAction(
                 actions,
                 delegate {
-                    TargetShip.CanPerformActionsWhileStressed = oldValue;
+                    TargetShip.OnCheckCanPerformActionsWhileStressed -= ConfirmThatIsPossible;
+                    TargetShip.OnCanPerformActionWhileStressed -= AlwaysAllow;
+
                     Selection.ThisShip = HostShip;
                     TargetShip.BeforeActionIsPerformed -= PayForceCost;
                     Triggers.FinishTrigger();
@@ -113,6 +118,16 @@ namespace Abilities.SecondEdition
             priority += ship.PilotInfo.Cost;
 
             return priority;
+        }
+
+        private void ConfirmThatIsPossible(ref bool isAllowed)
+        {
+            AlwaysAllow(null, ref isAllowed);
+        }
+
+        private void AlwaysAllow(GenericAction action, ref bool isAllowed)
+        {
+            isAllowed = true;
         }
     }
 }

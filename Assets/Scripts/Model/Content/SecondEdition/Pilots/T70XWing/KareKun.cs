@@ -13,14 +13,11 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Kare Kun",
                     4,
-                    52,
+                    51,
                     isLimited: true,
                     abilityType: typeof(Abilities.SecondEdition.KareKunAbility),
                     extraUpgradeIcon: UpgradeType.Talent
-                //seImageNumber: 93
                 );
-
-                //ModelInfo.SkinName = "Black One";
 
                 ImageUrl = "https://images-cdn.fantasyflightgames.com/filer_public/42/59/42597afe-f592-4bac-98ad-f70e876fb451/swz25_kare_a1.png";
             }

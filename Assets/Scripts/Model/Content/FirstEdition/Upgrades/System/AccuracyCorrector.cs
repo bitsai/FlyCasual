@@ -11,7 +11,7 @@ namespace UpgradesList.FirstEdition
         {
             UpgradeInfo = new UpgradeCardInfo(
                 "Accuracy Corrector",
-                UpgradeType.System,
+                UpgradeType.Sensor,
                 cost: 3,
                 abilityType: typeof(Abilities.FirstEdition.AccuracyCorrectorAbility)
             );
@@ -35,7 +35,7 @@ namespace Abilities.FirstEdition
 
         private void AddAccuracyCorrectorAbility(GenericShip ship)
         {
-            ship.AddAvailableDiceModification(new AccuracyCorrectorAction());
+            ship.AddAvailableDiceModificationOwn(new AccuracyCorrectorAction());
         }
     }
 }

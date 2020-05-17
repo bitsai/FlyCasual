@@ -16,6 +16,8 @@ namespace Ship
                     abilityType: typeof(Abilities.FirstEdition.FennRauScumAbility),
                     extraUpgradeIcon: UpgradeType.Talent
                 );
+
+                ModelInfo.SkinName = "Skull Squadron";
             }
         }
     }
@@ -41,7 +43,7 @@ namespace Abilities.FirstEdition
         {
             if (Combat.ShotInfo.Range == 1)
             {
-                Messages.ShowInfo("The attack is at range 1 -Fenn Rau gain +1 die");
+                Messages.ShowInfo(HostShip.PilotInfo.PilotName + ": The attack is at range 1, attacker gains +1 attack die");
                 value++;
             }
         }

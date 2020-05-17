@@ -13,11 +13,11 @@ namespace Ship.SecondEdition.Delta7Aethersprite
             PilotInfo = new PilotCardInfo(
                 "Obi-Wan Kenobi",
                 5,
-                47,
+                48,
                 true,
                 force: 3,
                 abilityType: typeof(Abilities.SecondEdition.ObiWanKenobiAbility),
-                extraUpgradeIcon: UpgradeType.Force
+                extraUpgradeIcon: UpgradeType.ForcePower
             );
             
             ImageUrl = "https://images-cdn.fantasyflightgames.com/filer_public/f9/24/f9246e39-4852-4a8f-a331-9b78f62439e9/swz32_obi-wan-kenobi.png";

@@ -51,12 +51,15 @@ namespace Abilities.SecondEdition
 
         private void RegisterLoseCharge(GenericShip ship)
         {
-            RegisterAbilityTrigger(TriggerTypes.OnSystemsPhaseStart, LoseCharge);
+            if (ship.DockingHost == null)
+            {
+                RegisterAbilityTrigger(TriggerTypes.OnSystemsPhaseStart, LoseCharge);
+            }
         }
 
         private void LoseCharge(object sender, System.EventArgs e)
         {
-            Messages.ShowInfo("Autopilot Drone loses 1 charge");
+            Messages.ShowInfo(HostShip.PilotInfo.PilotName + " loses 1 charge");
             HostShip.RemoveCharge(Triggers.FinishTrigger);
         }
 

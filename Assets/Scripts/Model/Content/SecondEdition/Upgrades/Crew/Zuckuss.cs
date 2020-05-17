@@ -45,7 +45,7 @@ namespace Abilities.SecondEdition
                 ImageUrl = HostUpgrade.ImageUrl,
                 HostShip = host
             };
-            host.AddAvailableDiceModification(newAction);
+            host.AddAvailableDiceModificationOwn(newAction);
         }
     }
 }
@@ -85,7 +85,10 @@ namespace ActionsList
                 NumberOfDiceCanBeRerolled = 1,
                 IsOpposite = true,
                 CallBack = delegate {
-                    AssignStress(callBack);
+                    if (Combat.CurrentDiceRoll.DiceRerolled.Any())
+                        AssignStress(callBack);
+                    else
+                        callBack();
                 }
             };
             diceRerollManager.Start();

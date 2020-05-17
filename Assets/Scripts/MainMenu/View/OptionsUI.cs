@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using Upgrade;
 
@@ -15,6 +16,13 @@ public class OptionsUI : MonoBehaviour {
     public GameObject Selector { get; private set; }
 
     private const float FREE_SPACE_EXTRA_OPTIONS = 25f;
+
+    private static readonly List<string> QualityNames = new List<string>()
+    {
+        "Fast",
+        "Good",
+        "Beautiful"
+    };
 
     private void Start()
     {
@@ -62,6 +70,9 @@ public class OptionsUI : MonoBehaviour {
                 break;
             case "Animations":
                 ShowViewSimple("Animations");
+                break;
+            case "Video":
+                ShowVideoView();
                 break;
             case "Sounds":
                 ShowViewSimple("Sounds");
@@ -322,6 +333,160 @@ public class OptionsUI : MonoBehaviour {
 
             ModRecord.transform.Find("Toggle").GetComponent<Toggle>().isOn = ExtraOptionsManager.ExtraOptions[mod.Key].IsOn;
         }
+    }
+
+    private void ShowVideoView()
+    {
+        Transform parentTransform = GameObject.Find("UI/Panels/OptionsPanel/Content/ContentViewPanel").transform;
+        string prefabPath = "Prefabs/MainMenu/Options/VideoViewPanel";
+        GameObject prefab = (GameObject)Resources.Load(prefabPath, typeof(GameObject));
+        GameObject panel = Instantiate(prefab, parentTransform);
+
+        Console.Write("Fullscreen: " + Options.FullScreen.ToString());
+        Toggle fullscreen = panel.transform.Find("FullscreenCheckboxPanel/ToggleHolder/Toggle").GetComponent<Toggle>();
+        fullscreen.isOn = Options.FullScreen;
+        Console.Write("Fullscreen toggle: " + fullscreen.isOn);
+        fullscreen.onValueChanged.AddListener(ChangeFullscreen);
+
+        Console.Write("Fps: " + Options.ShowFps.ToString());
+        Toggle fps = panel.transform.Find("FpsCheckboxPanel/ToggleHolder/Toggle").GetComponent<Toggle>();
+        fps.isOn = Options.ShowFps;
+        Console.Write("Fps toggle: " + fps.isOn);
+        fps.onValueChanged.AddListener(ChangeFps);
+
+        Console.Write("Quality int: " + Options.Quality);
+        Console.Write("Quality: " + QualityNames[Options.Quality]);
+        int qualityLevel = Options.Quality;
+        Text qualityText = panel.transform.Find("QualityComboboxPanel/ComboboxHolder/InputBox/Text").GetComponent<Text>();
+        qualityText.text = QualityNames[qualityLevel];
+        Button buttonQualityLess = panel.transform.Find("QualityComboboxPanel/ComboboxHolder/ButtonLess").GetComponent<Button>();
+        buttonQualityLess.onClick.AddListener(delegate { ChangeQuality(qualityText, -1); });
+        Button buttonQualityMore = panel.transform.Find("QualityComboboxPanel/ComboboxHolder/ButtonMore").GetComponent<Button>();
+        buttonQualityMore.onClick.AddListener(delegate { ChangeQuality(qualityText, +1); });
+
+        try
+        {
+            Console.Write("Resolution: " + Options.Resolution);
+            Console.Write("Available Resolutions: " + Screen.resolutions.Length);
+            string resolution = Options.Resolution;
+            Text resolutionText = panel.transform.Find("ResolutionComboboxPanel/ComboboxHolder/InputBox/Text").GetComponent<Text>();
+            if (!HasSupportOfResolution(resolution)) resolution = GetAllResolutions().Last().ToString();
+            resolutionText.text = resolution;
+            Button buttonResolutionLess = panel.transform.Find("ResolutionComboboxPanel/ComboboxHolder/ButtonLess").GetComponent<Button>();
+            buttonResolutionLess.onClick.AddListener(delegate { ChangeResolution(resolutionText, -1); });
+            Button buttonResolutionMore = panel.transform.Find("ResolutionComboboxPanel/ComboboxHolder/ButtonMore").GetComponent<Button>();
+            buttonResolutionMore.onClick.AddListener(delegate { ChangeResolution(resolutionText, +1); });
+        }
+        catch (Exception)
+        {
+            Text resolutionText = panel.transform.Find("ResolutionComboboxPanel/ComboboxHolder/InputBox/Text").GetComponent<Text>();
+            resolutionText.text = "Default";
+        }
+
+        try
+        {
+            Console.Write("Monitors: " + Display.displays.Count());
+            int displayId = Options.DisplayId;
+            Text displayIdText = panel.transform.Find("DisplayComboboxPanel/ComboboxHolder/InputBox/Text").GetComponent<Text>();
+            displayIdText.text = "Monitor " + (displayId + 1);
+            Button buttonDisplayLess = panel.transform.Find("DisplayComboboxPanel/ComboboxHolder/ButtonLess").GetComponent<Button>();
+            buttonDisplayLess.onClick.AddListener(delegate { ChangeDisplay(ref displayId, -1, displayIdText); });
+            Button buttonDisplayMore = panel.transform.Find("DisplayComboboxPanel/ComboboxHolder/ButtonMore").GetComponent<Button>();
+            buttonDisplayMore.onClick.AddListener(delegate { ChangeDisplay(ref displayId, +1, displayIdText); });
+        }
+        catch (Exception)
+        {
+            Messages.ShowError("Error during creation of list of available monitors");
+        }
+    }
+
+    private void ChangeDisplay(ref int displayId, int change, Text displayIdText)
+    {
+        try
+        {
+            displayId += change;
+            Console.Write(displayId.ToString());
+
+            if (displayId < 0 || displayId >= Display.displays.Count())
+            {
+                Console.Write("Monitor: Out of Range");
+                displayId -= change;
+            }
+            else
+            {
+                Options.DisplayId = displayId;
+                Options.ChangeParameterValue("DisplayId", displayId);
+
+                displayIdText.text = "Monitor " + (displayId + 1);
+
+                Console.Write("Activated Monitor " + (displayId + 1));
+
+                PlayerPrefs.SetInt("UnitySelectMonitor", displayId);
+            }
+
+            Messages.ShowInfo("Restart to apply change of monitor");
+        }
+        catch (Exception)
+        {
+            Messages.ShowError("Error during changing of monitor");
+        }
+    }
+
+    private void ChangeResolution(Text resolutionText, int change)
+    {
+        try
+        {
+            Resolution[] availableResolutions = GetAllResolutions();
+            if (HasSupportOfResolution(resolutionText.text))
+            {
+                Resolution currentResolution = availableResolutions.FirstOrDefault(n => n.ToString() == resolutionText.text);
+                int currentIndex = Array.IndexOf(availableResolutions, currentResolution);
+                int newIndex = Mathf.Clamp(currentIndex + change, 0, availableResolutions.Length - 1);
+
+                Resolution newResolution = availableResolutions[newIndex];
+                resolutionText.text = newResolution.ToString();
+                Options.ChangeParameterValue("Resolution", newResolution.ToString());
+                Screen.SetResolution(newResolution.width, newResolution.height, Options.FullScreen, newResolution.refreshRate);
+            }
+        }
+        catch (Exception)
+        {
+            Messages.ShowError("Error during changing of resolution");
+        }
+    }
+
+    private Resolution[] GetAllResolutions()
+    {
+        return Screen.resolutions.Where(n => n.width >= 1280).ToArray();
+    }
+
+    private bool HasSupportOfResolution(string resolutionText)
+    {
+        return GetAllResolutions().Any(n => n.ToString() == resolutionText);
+    }
+
+    private void ChangeQuality(Text text, int change)
+    {
+        int qualityLevel = Options.Quality;
+
+        qualityLevel = Mathf.Clamp(qualityLevel + change, 0, 2);
+
+        Options.Quality = qualityLevel;
+        Options.ChangeParameterValue("Quality", qualityLevel);
+        text.text = QualityNames[qualityLevel];
+    }
+
+    private void ChangeFullscreen(bool isFullscreen)
+    {
+        Options.FullScreen = isFullscreen;
+        Options.ChangeParameterValue("FullScreen" , isFullscreen);
+        Screen.fullScreen = isFullscreen;
+    }
+
+    private void ChangeFps(bool isShowFps)
+    {
+        Options.ShowFps = true;
+        Options.ChangeParameterValue("ShowFps", isShowFps);
     }
 
 }

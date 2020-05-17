@@ -12,11 +12,11 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Ezra Bridger",
                     3,
-                    41,
+                    40,
                     isLimited: true,
                     abilityType: typeof(Abilities.SecondEdition.EzraBridgerPilotAbility),
                     force: 1,
-                    extraUpgradeIcon: UpgradeType.Force,
+                    extraUpgradeIcon: UpgradeType.ForcePower,
                     seImageNumber: 36
                 );
             }
@@ -40,16 +40,17 @@ namespace Abilities.SecondEdition
 
         private void AddEzraBridgerPilotAbilitySE(GenericShip ship)
         {
-            EzraBridgerActionSE newAction = new EzraBridgerActionSE() { HostShip = this.HostShip };
-            ship.AddAvailableDiceModification(newAction);
+            ship.AddAvailableDiceModificationOwn(new EzraBridgerActionSE());
         }
 
         private class EzraBridgerActionSE : ActionsList.GenericAction
         {
+            public override string Name => HostShip.PilotInfo.PilotName;
+            public override string DiceModificationName => HostShip.PilotInfo.PilotName;
+            public override string ImageUrl => HostShip.ImageUrl;
+
             public EzraBridgerActionSE()
             {
-                Name = DiceModificationName = "Ezra Bridger's ability";
-
                 TokensSpend.Add(typeof(Tokens.ForceToken));
             }
 

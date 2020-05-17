@@ -160,7 +160,7 @@ public partial class Console : MonoBehaviour {
             jsonData.AddField("p2squad", "None");
         }
 
-        var request = new UnityWebRequest("http://flycasual.azurewebsites.net/api/errorreport", "POST");
+        var request = new UnityWebRequest("http://flycasualapi.sandrem.space/api/errorreport", "POST");
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData.ToString());
         request.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
@@ -175,6 +175,10 @@ public partial class Console : MonoBehaviour {
             (text == "ServerDisconnected due to error: Timeout") ||
             text.StartsWith("Screen position out of view frustum")) return true;
 
+        if (text == "SerializedObject target has been destroyed.") return true;
+
+        if (text == "Material doesn't have a color property '_Color'") return true;
+
         return false;
     }
 
@@ -182,7 +186,7 @@ public partial class Console : MonoBehaviour {
     {
         if (string.IsNullOrEmpty(inputText)) return;
 
-        List<string> blocks = inputText.ToLower().Split(' ').ToList();
+        List<string> blocks = inputText.Split(' ').ToList();
         string keyword = blocks.FirstOrDefault();
         blocks.RemoveAt(0);
 

@@ -38,14 +38,22 @@ public static partial class Tools
     {
         string result = originalString.ToLower();
 
+        if (result.Contains("("))
+        {
+            result = result.Substring(0, result.IndexOf("("));
+        }
+
         string[] signsToReplace = new string[] { " ", "\"", "/", "'", "-" };
         foreach (var sign in signsToReplace)
         {
             result = result.Replace(sign, "");
         }
 
-        result = result.Replace("adv.", "adv");
-        result = result.Replace("advanced", "adv");
+        if (Editions.Edition.Current is Editions.FirstEdition)
+        {
+            result = result.Replace("adv.", "adv");
+            result = result.Replace("advanced", "adv");
+        }
 
         return result;
     }

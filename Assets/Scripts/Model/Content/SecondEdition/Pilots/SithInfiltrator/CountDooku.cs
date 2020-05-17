@@ -21,7 +21,7 @@ namespace Ship.SecondEdition.SithInfiltrator
                 abilityType: typeof(Abilities.SecondEdition.CountDookuPilotAbility),
                 pilotTitle: "Darth Tyranus",
                 force: 3,
-                extraUpgradeIcon: UpgradeType.Force
+                extraUpgradeIcon: UpgradeType.ForcePower
             );
 
             ImageUrl = "https://images-cdn.fantasyflightgames.com/filer_public/3d/83/3d83b84f-e7d4-46b3-83ae-4d49245ae50d/swz30_count-dooku.png";
@@ -110,7 +110,7 @@ namespace Abilities.SecondEdition
                 subphase.DecisionOwner = HostShip.Owner;
                 subphase.ShowSkipButton = true;
 
-                subphase.DescriptionShort = "Count Dooku";
+                subphase.DescriptionShort = HostShip.PilotInfo.PilotName;
                 subphase.DescriptionLong = "You can spend a force token to remove a red or a blue token from your ship";
                 subphase.ImageSource = HostShip;
 

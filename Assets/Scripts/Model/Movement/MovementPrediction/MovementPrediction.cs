@@ -6,6 +6,7 @@ using Obstacles;
 using Ship;
 using Bombs;
 using Remote;
+using System.Linq;
 
 namespace Movement
 {
@@ -25,6 +26,7 @@ namespace Movement
 
         public List<GenericShip> ShipsBumped = new List<GenericShip>();
         public List<GenericRemote> RemotesOverlapped = new List<GenericRemote>();
+        public List<GenericRemote> RemotesMovedThrough = new List<GenericRemote>();
         public List<GenericObstacle> AsteroidsHit = new List<GenericObstacle>();
         public List<GenericDeviceGameObject> MinesHit = new List<GenericDeviceGameObject>();
         public bool IsLandedOnAsteroid { get { return LandedOnObstacles.Count > 0; } }
@@ -41,12 +43,33 @@ namespace Movement
             CurrentMovement = movement;
 
             Selection.ThisShip.ToggleColliders(false);
-            GenerateShipStands();
         }
 
         public IEnumerator CalculateMovementPredicition()
         {
             yield return UpdateColisionDetectionAlt();
+        }
+
+        public void CalculateOnlyFinalPosition()
+        {
+            if (CurrentMovement.RotationEndDegrees != 0)
+            {
+                Vector3 centerOfTempBase = generatedShipStands[generatedShipStands.Length - 1].transform.TransformPoint(new Vector3(0, 0, -Selection.ThisShip.ShipBase.HALF_OF_SHIPSTAND_SIZE));
+                generatedShipStands[generatedShipStands.Length - 1].transform.RotateAround(centerOfTempBase, new Vector3(0, 1, 0), CurrentMovement.RotationEndDegrees);
+            }
+
+            FinalPosition = generatedShipStands[generatedShipStands.Length - 1].transform.position;
+            FinalAngles = generatedShipStands[generatedShipStands.Length - 1].transform.eulerAngles;
+            FinalPositionInfo = new ShipPositionInfo(FinalPosition, FinalAngles);
+
+            if (!DebugManager.DebugMovementDestroyTempBasesLater)
+            {
+                DestroyGeneratedShipStands();
+            }
+            else
+            {
+                GameManagerScript.Wait(2, DestroyGeneratedShipStands);
+            }
         }
 
         public MovementPrediction(GenericMovement movement, Action callBack)
@@ -61,9 +84,25 @@ namespace Movement
             Game.Movement.FuncsToUpdate.Add(UpdateColisionDetection);
         }
 
-        private void GenerateShipStands()
+        public void GenerateShipStands()
         {
             generatedShipStands = CurrentMovement.PlanMovement();
+
+            FinalPosition = generatedShipStands.Last().transform.position;
+            FinalAngles = generatedShipStands.Last().transform.eulerAngles;
+            FinalPositionInfo = new ShipPositionInfo(FinalPosition, FinalAngles);
+            CurrentMovement.FinalPositionInfo = FinalPositionInfo;
+
+            if (CurrentMovement.RotationEndDegrees != 0)
+            {
+                Vector3 centerOfTempBase = generatedShipStands.Last().transform.TransformPoint(new Vector3(0, 0, -Selection.ThisShip.ShipBase.HALF_OF_SHIPSTAND_SIZE));
+                generatedShipStands.Last().transform.RotateAround(centerOfTempBase, new Vector3(0, 1, 0), CurrentMovement.RotationEndDegrees);
+            }
+        }
+
+        public void GenerateFinalShipStand()
+        {
+            generatedShipStands = CurrentMovement.PlanFinalPosition();
         }
 
         private IEnumerator UpdateColisionDetectionAlt()
@@ -159,16 +198,13 @@ namespace Movement
 
                         finalPositionFound = true;
 
-                        // Rotate last temp base
-                        if (i == generatedShipStands.Length - 1 && CurrentMovement.RotationEndDegrees != 0)
+                        if (i != generatedShipStands.Length - 1)
                         {
-                            Vector3 centerOfTempBase = generatedShipStands[i].transform.TransformPoint(new Vector3(0, 0, -0.5f));
-                            generatedShipStands[i].transform.RotateAround(centerOfTempBase, new Vector3(0, 1, 0), CurrentMovement.RotationEndDegrees);
+                            FinalPosition = generatedShipStands[i].transform.position;
+                            FinalAngles = generatedShipStands[i].transform.eulerAngles;
+                            FinalPositionInfo = new ShipPositionInfo(FinalPosition, FinalAngles);
+                            CurrentMovement.FinalPositionInfo = FinalPositionInfo;
                         }
-
-                        FinalPosition = generatedShipStands[i].transform.position;
-                        FinalAngles = generatedShipStands[i].transform.eulerAngles;
-                        FinalPositionInfo = new ShipPositionInfo(FinalPosition, FinalAngles);
 
                         //break;
                     }
@@ -182,12 +218,21 @@ namespace Movement
                             AsteroidsHit.Add(asteroidHit);
                         }
                     }
+
                     foreach (var mineHit in obstacleHitsDetector.OverlapedMines)
                     {
                         GenericDeviceGameObject MineObject = mineHit.transform.parent.GetComponent<GenericDeviceGameObject>();
                         if (!MinesHit.Contains(MineObject))
                         {
                             MinesHit.Add(MineObject);
+                        }
+                    }
+
+                    foreach (var remoteMovedThrough in obstacleHitsDetector.RemotesMovedThrough)
+                    {
+                        if (!RemotesMovedThrough.Contains(remoteMovedThrough))
+                        {
+                            RemotesMovedThrough.Add(remoteMovedThrough);
                         }
                     }
                 }

@@ -12,11 +12,11 @@ namespace UpgradesList.SecondEdition
             UpgradeInfo = new UpgradeCardInfo(
                 "Fifth Brother",
                 UpgradeType.Gunner,
-                cost: 9,
+                cost: 11,
                 isLimited: true,
                 addForce: 1,
                 restriction: new FactionRestriction(Faction.Imperial),
-                abilityType: typeof(Abilities.SecondEdition.FifthBrotherAbility),
+                abilityType: typeof(Abilities.SecondEdition.FifthBrotherGunnerAbility),
                 seImageNumber: 122
             );
         }        
@@ -25,7 +25,7 @@ namespace UpgradesList.SecondEdition
 
 namespace Abilities.SecondEdition
 {
-    public class FifthBrotherAbility : GenericAbility
+    public class FifthBrotherGunnerAbility : GenericAbility
     {
         public override void ActivateAbility()
         {

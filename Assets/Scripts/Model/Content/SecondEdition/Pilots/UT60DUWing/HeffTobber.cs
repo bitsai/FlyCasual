@@ -17,7 +17,7 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Heff Tobber",
                     2,
-                    45,
+                    44,
                     isLimited: true,
                     abilityType: typeof(HeffTobberAbility),
                     extraUpgradeIcon: UpgradeType.Talent,
@@ -51,7 +51,7 @@ namespace Abilities.SecondEdition
 
             Triggers.RegisterTrigger(new Trigger()
             {
-                Name = "Heff Tobber's ability",
+                Name = HostShip.PilotInfo.PilotName,
                 TriggerType = TriggerTypes.OnMovementFinish,
                 TriggerOwner = HostShip.Owner.PlayerNo,
                 EventHandler = UseHeffTobberAbility

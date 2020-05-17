@@ -24,7 +24,7 @@ namespace Ship
                     charges: 1
                 );
 
-                ModelInfo.SkinName = "Red";
+                ModelInfo.SkinName = "Wolffe";
 
                 ImageUrl = "https://images-cdn.fantasyflightgames.com/filer_public/fb/ae/fbae3c90-c9bb-483a-a929-4381c205d416/swz33_wolffe.png";
             }
@@ -143,13 +143,13 @@ namespace Abilities.SecondEdition
             if (HostShip.State.Charges < HostShip.State.MaxCharges)
             {
                 AllowRollAdditionalDie();
-                HostShip.State.Charges++;
             }
             DecisionSubPhase.ConfirmDecision();
         }
 
         private void AllowRollAdditionalDie()
         {
+            HostShip.State.Charges++;
             HostShip.AfterGotNumberOfAttackDice += RollExtraDie;
         }
 

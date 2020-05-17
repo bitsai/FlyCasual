@@ -6,6 +6,7 @@ using Actions;
 using Arcs;
 using Upgrade;
 using Ship;
+using System;
 
 namespace Ship
 {
@@ -17,7 +18,7 @@ namespace Ship
             {
                 ShipInfo.ShipName = "TIE Advanced x1";
 
-                ShipInfo.UpgradeIcons.Upgrades.Add(UpgradeType.System);
+                ShipInfo.UpgradeIcons.Upgrades.Add(UpgradeType.Sensor);
 
                 ShipInfo.ActionIcons.RemoveActions(typeof(EvadeAction));
                 ShipInfo.ActionIcons.AddLinkedAction(new LinkedActionInfo(typeof(FocusAction), typeof(BarrelRollAction)));
@@ -33,8 +34,6 @@ namespace Ship
                 DialInfo.AddManeuver(new ManeuverHolder(ManeuverSpeed.Speed3, ManeuverDirection.Right, ManeuverBearing.TallonRoll), MovementComplexity.Complex);
 
                 ManeuversImageUrl = "https://vignette.wikia.nocookie.net/xwing-miniatures-second-edition/images/0/08/Maneuver_tie_advanced_x1.png";
-
-                OldShipTypeName = "TIE Advanced";
             }
         }
     }
@@ -50,6 +49,7 @@ namespace Abilities.SecondEdition
         public override void ActivateAbility()
         {
             HostShip.AfterGotNumberOfAttackDice += CheckAbility;
+            HostShip.Ai.OnGetActionPriority += IncreaseAILockPriority;
 
             AddDiceModification(
                 "Advanced Targeting Computer",
@@ -65,12 +65,18 @@ namespace Abilities.SecondEdition
         public override void DeactivateAbility()
         {
             HostShip.AfterGotNumberOfAttackDice -= CheckAbility;
+            HostShip.Ai.OnGetActionPriority -= IncreaseAILockPriority;
             RemoveDiceModification();
         }
 
         private int GetAiPriority()
         {
             return 20;
+        }
+
+        private void IncreaseAILockPriority(GenericAction action, ref int priority)
+        {
+            if (action is TargetLockAction && TargetLockAction.HasValidLockTargetsAndNoLockOnShipInRange(HostShip)) priority = 55;
         }
 
         private bool IsAvailable()

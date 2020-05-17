@@ -18,7 +18,7 @@ public static partial class Roster {
     private static int SHIP_PANEL_HEIGHT = 110;
     private static int SPACE_BETWEEN_PANELS = 5;
 
-    public static void Initialize()
+    public static IEnumerator Initialize()
     {
         Players = new List<GenericPlayer>();
         rosterPlayer1 = new List<GameObject>();
@@ -26,7 +26,7 @@ public static partial class Roster {
         AllUnits = new Dictionary<string, GenericShip>();
         Reserve = new List<GenericShip>();
 
-        PrepareSquadrons();
+        yield return PrepareSquadrons();
         CreatePlayers();
         SpawnAllShips();
         SetPlayerCustomization();
@@ -64,7 +64,7 @@ public static partial class Roster {
 
         GameObject shipTypeGO = newPanel.transform.Find("ShipInfo/ShipTypeText").gameObject;
         shipTypeGO.GetComponent<Text>().text = newShip.ShipInfo.ShipName;
-        Tooltips.AddTooltip(shipTypeGO, newShip.ManeuversImageUrl);
+        TooltipSpecial.AddTooltip(shipTypeGO, (Transform transform) => { ShowDial(newShip, transform); });
         SubscribeSelectionByInfoPanel(shipTypeGO);
 
         //Mark
@@ -77,6 +77,7 @@ public static partial class Roster {
         //Assigned Maneuver Dial
         GameObject maneuverDial = newPanel.transform.Find("AssignedManeuverDial").gameObject;
         SubscribeShowManeuverByHover(maneuverDial);
+        SubscribeShowPredictionByClick(maneuverDial);
         maneuverDial.transform.localPosition = (rosterPanelOwner == PlayerNo.Player1) ? new Vector3(320, -5, 0) : new Vector3(-120, -5, 0);
 
         //Tags
@@ -88,6 +89,15 @@ public static partial class Roster {
         newPanel.transform.Find("ShipInfo").gameObject.SetActive(true);
 
         return newPanel;
+    }
+
+    private static void ShowDial(GenericShip ship, Transform transform)
+    {
+        GameObject dial = GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/ManeuversDial/ManeuversDialView"), transform);
+        dial.name = "SpecialTooltip";
+        ManeuversDialView dialView = dial.GetComponent<ManeuversDialView>();
+        dialView.Initialize(ship.DialInfo.PrintedDial, isDisabled: true);
+        transform.GetComponent<RectTransform>().sizeDelta = new Vector2(dialView.Width, dialView.Height);
     }
 
     public static void UpdateDamageIndicators(GenericShip ship, GameObject panel)
@@ -151,6 +161,22 @@ public static partial class Roster {
         entry.eventID = EventTriggerType.PointerClick;
         entry.callback.AddListener((data) => { SelectShipByRosterClick((PointerEventData)data); });
         trigger.triggers.Add(entry);
+    }
+
+    public static void SubscribeShowPredictionByClick(GameObject panel)
+    {
+        EventTrigger trigger = panel.GetComponent<EventTrigger>();
+        EventTrigger.Entry entry = new EventTrigger.Entry();
+        entry.eventID = EventTriggerType.PointerClick;
+        entry.callback.AddListener((data) => { ShowPredictionByClick((PointerEventData)data); });
+        trigger.triggers.Add(entry);
+    }
+
+    private static void ShowPredictionByClick(PointerEventData data)
+    {
+        GenericShip ship = GetShipByUiPointerData(data);
+
+        ExtraOptions.ExtraOptionsList.ShowManeuverPrediction.ShowPrediction(ship);
     }
 
     private static void AddToRoster(GenericShip newShip, GameObject newPanel)
@@ -277,17 +303,36 @@ public static partial class Roster {
     // RMB is not supported
     public static void SelectShipByRosterClick(PointerEventData data)
     {
+        GenericShip shipByPanel = GetShipByUiPointerData(data);
+        if (shipByPanel != null)
+        {
+            Selection.TryToChangeShip("ShipId:" + shipByPanel.ShipId);
+        }
+        else
+        {
+            Messages.ShowError("Error: ship is not found");
+        }
+
+        UI.HideTemporaryMenus();
+    }
+
+    private static GenericShip GetShipByUiPointerData(PointerEventData data)
+    {
+        GenericShip result = null;
+
         foreach (var item in data.hovered)
         {
             if (item.tag != "Untagged")
             {
                 if (Roster.AllUnits.ContainsKey(item.tag))
                 {
-                    if (Selection.TryToChangeShip(item.tag)) return;
+                    result = Roster.GetShipById(item.tag);
+                    break;
                 }
             }
         }
-        UI.HideTemporaryMenus();
+
+        return result;
     }
 
     public static void ShowAssignedManeuverByHover(PointerEventData data)

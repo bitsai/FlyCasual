@@ -19,7 +19,7 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "IG-88A",
                     4,
-                    68,
+                    67,
                     isLimited: true,
                     abilityType: typeof(Abilities.SecondEdition.IG88AAbility),
                     extraUpgradeIcon: UpgradeType.Talent,
@@ -59,7 +59,7 @@ namespace Abilities.SecondEdition
             if (TargetsForAbilityExist(FilterAbilityTarget))
             {
                 Selection.ChangeActiveShip(HostShip);
-                Messages.ShowInfoToHuman("IG-88A Ability: Select a ship to transfer a calculate token to");
+                Messages.ShowInfoToHuman(HostShip.PilotInfo.PilotName + ": Select a ship to transfer a calculate token to");
 
                 SelectTargetForAbility(
                     TransferCalculate,

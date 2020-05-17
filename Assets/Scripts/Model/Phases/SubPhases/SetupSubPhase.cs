@@ -7,6 +7,7 @@ using BoardTools;
 using GameModes;
 using GameCommands;
 using System;
+using System.Globalization;
 
 namespace SubPhases
 {
@@ -21,7 +22,7 @@ namespace SubPhases
         private static bool inReposition;
 
         public Transform StartingZone { get; protected set; }
-        private bool isInsideStartingZone;
+        private bool IsInsideStartingZone;
 
         private TouchObjectPlacementHandler touchObjectPlacementHandler = new TouchObjectPlacementHandler();
 
@@ -55,7 +56,7 @@ namespace SubPhases
                 }
                 else
                 {
-                    FinishPhase();
+                    FinishSetupPhase();
                 }
             }
 
@@ -67,6 +68,20 @@ namespace SubPhases
                 IsReadyForCommands = true;
                 Roster.GetPlayer(RequiredPlayer).SetupShip();
             }
+        }
+
+        private void FinishSetupPhase()
+        {
+            if (DebugManager.DebugStraightToCombat)
+            {
+                foreach (GenericShip ship in Roster.AllShips.Values)
+                {
+                    float direction = (ship.Owner.PlayerNo == Players.PlayerNo.Player1) ? 1f : -1f;
+                    ship.SetPosition(ship.GetPosition() + new Vector3(0, 0, direction * Board.BoardIntoWorld(30f)));
+                }
+            }
+
+            FinishPhase();
         }
 
         private bool GetNextActivation(int pilotSkill)
@@ -160,9 +175,17 @@ namespace SubPhases
         public static GameCommand GeneratePlaceShipCommand(int shipId, Vector3 position, Vector3 angles)
         {
             JSONObject parameters = new JSONObject();
+
             parameters.AddField("id", shipId.ToString());
-            parameters.AddField("positionX", position.x.ToString()); parameters.AddField("positionY", position.y.ToString()); parameters.AddField("positionZ", position.z.ToString());
-            parameters.AddField("rotationX", angles.x.ToString()); parameters.AddField("rotationY", angles.y.ToString()); parameters.AddField("rotationZ", angles.z.ToString());
+
+            parameters.AddField("positionX", position.x.ToString(CultureInfo.InvariantCulture));
+            parameters.AddField("positionY", position.y.ToString(CultureInfo.InvariantCulture));
+            parameters.AddField("positionZ", position.z.ToString(CultureInfo.InvariantCulture));
+
+            parameters.AddField("rotationX", angles.x.ToString(CultureInfo.InvariantCulture));
+            parameters.AddField("rotationY", angles.y.ToString(CultureInfo.InvariantCulture));
+            parameters.AddField("rotationZ", angles.z.ToString(CultureInfo.InvariantCulture));
+
             return GameController.GenerateGameCommand(
                 GameCommandTypes.ShipPlacement,
                 typeof(SetupSubPhase),
@@ -193,7 +216,7 @@ namespace SubPhases
 
         private void CheckPerformRotation()
         {
-            if (Console.IsActive || Selection.ThisShip == null) return;
+            if (Console.IsActive || Selection.ThisShip == null || Selection.ThisShip.Owner is Players.GenericAiPlayer) return;
 
             CheckResetRotation();
             if (Input.GetKey(KeyCode.LeftControl))
@@ -260,7 +283,7 @@ namespace SubPhases
         public void StartDrag()
         {
             StartingZone = Board.GetStartingZone(Phases.CurrentSubPhase.RequiredPlayer);
-            isInsideStartingZone = false;
+            IsInsideStartingZone = false;
             Roster.SetRaycastTargets(false);
             Roster.AllShipsHighlightOff();
             Board.HighlightStartingZones(Phases.CurrentSubPhase.RequiredPlayer);
@@ -396,35 +419,102 @@ namespace SubPhases
 
         private void ApplySetupPositionLimits()
         {
-            Vector3 newPosition = Selection.ThisShip.GetCenter();
-            Dictionary<string, float> newBounds = Selection.ThisShip.ShipBase.GetBounds();
-
-            if (!isInsideStartingZone)
-            {
-                if ((Selection.ThisShip.Owner.PlayerNo == Players.PlayerNo.Player2 && (newBounds["maxZ"] < StartingZone.TransformPoint(0.5f, 0.5f, 0.5f).z))
-                    || (Selection.ThisShip.Owner.PlayerNo == Players.PlayerNo.Player1 && (newBounds["minZ"] > StartingZone.TransformPoint(-0.5f, -0.5f, -0.5f).z)))
-                {
-                    isInsideStartingZone = true;
-                }
-            }
-
-            if (isInsideStartingZone)
+            if (CheckIsInsideStartigZone())
             {
                 if (SetupFilter == null)
                 {
-                    if (newBounds["maxZ"] > StartingZone.TransformPoint(0.5f, 0.5f, 0.5f).z) newPosition.z = StartingZone.TransformPoint(0.5f, 0.5f, 0.5f).z - (newBounds["maxZ"] - newPosition.z + 0.01f);
-                    if (newBounds["minZ"] < StartingZone.TransformPoint(-0.5f, -0.5f, -0.5f).z) newPosition.z = StartingZone.TransformPoint(-0.5f, -0.5f, -0.5f).z + (newPosition.z - newBounds["minZ"] + 0.01f);
+                    FixZPositionByStartingZone();
                 }
                 else
                 {
-                    if (newBounds["maxZ"] > Board.GetBoard().TransformPoint(45.72f, 45.72f, 45.72f).z) newPosition.z = Board.GetBoard().TransformPoint(45.72f, 45.72f, 45.72f).z - (newBounds["maxZ"] - newPosition.z + 0.01f);
-                    if (newBounds["minZ"] < Board.GetBoard().TransformPoint(-45.72f, -45.72f, -45.72f).z) newPosition.z = Board.GetBoard().TransformPoint(-45.72f, -45.72f, -45.72f).z + (newPosition.z - newBounds["minZ"] + 0.01f);
+                    FixZPositionByBoard();
                 }
             }
 
+            FixXPosition();
+        }
+
+        private static void FixZPositionByBoard()
+        {
+            Vector3 newPosition = Selection.ThisShip.GetCenter();
+            Dictionary<string, float> newBounds = Selection.ThisShip.ShipBase.GetBounds();
+
+            if (newBounds["maxZ"] > Board.GetBoard().TransformPoint(45.72f, 45.72f, 45.72f).z) newPosition.z = Board.GetBoard().TransformPoint(45.72f, 45.72f, 45.72f).z - (newBounds["maxZ"] - newPosition.z + 0.01f);
+            if (newBounds["minZ"] < Board.GetBoard().TransformPoint(-45.72f, -45.72f, -45.72f).z) newPosition.z = Board.GetBoard().TransformPoint(-45.72f, -45.72f, -45.72f).z + (newPosition.z - newBounds["minZ"] + 0.01f);
+
+            Selection.ThisShip.SetCenter(newPosition);
+        }
+
+        private bool CheckIsInsideStartigZone()
+        {
+            if (!IsInsideStartingZone)
+            {
+                Vector3 newPosition = Selection.ThisShip.GetCenter();
+                Dictionary<string, float> newBounds = Selection.ThisShip.ShipBase.GetBounds();
+
+                if ((Selection.ThisShip.Owner.PlayerNo == Players.PlayerNo.Player2 && (newBounds["maxZ"] < StartingZone.TransformPoint(0.5f, 0.5f, 0.5f).z))
+                    || (Selection.ThisShip.Owner.PlayerNo == Players.PlayerNo.Player1 && (newBounds["minZ"] > StartingZone.TransformPoint(-0.5f, -0.5f, -0.5f).z)))
+                {
+                    IsInsideStartingZone = true;
+                }
+            }
+
+            return IsInsideStartingZone;
+        }
+
+        private void FixZPositionByStartingZone()
+        {
+            Vector3 newPosition = Selection.ThisShip.GetCenter();
+            Dictionary<string, float> newBounds = Selection.ThisShip.ShipBase.GetBounds();
+
+            if (RequiredPlayer == Players.PlayerNo.Player1)
+            {
+                if (newBounds["maxZ"] > StartingZone.TransformPoint(0.5f, 0.5f, 0.5f).z)
+                {
+                    newPosition.z = StartingZone.TransformPoint(0.5f, 0.5f, 0.5f).z - (newBounds["maxZ"] - newPosition.z + 0.01f);
+
+                    Selection.ThisShip.SetCenter(newPosition);
+                }
+
+                newPosition = Selection.ThisShip.GetCenter();
+                newBounds = Selection.ThisShip.ShipBase.GetBounds();
+
+                if (newBounds["minZ"] < StartingZone.TransformPoint(-0.5f, -0.5f, -0.5f).z)
+                {
+                    newPosition.z = StartingZone.TransformPoint(-0.5f, -0.5f, -0.5f).z + (newPosition.z - newBounds["minZ"] + 0.01f);
+
+                    Selection.ThisShip.SetCenter(newPosition);
+                }
+            }
+            else if (RequiredPlayer == Players.PlayerNo.Player2)
+            {
+                if (newBounds["minZ"] < StartingZone.TransformPoint(-0.5f, -0.5f, -0.5f).z)
+                {
+                    newPosition.z = StartingZone.TransformPoint(-0.5f, -0.5f, -0.5f).z + (newPosition.z - newBounds["minZ"] + 0.01f);
+
+                    Selection.ThisShip.SetCenter(newPosition);
+                }
+
+                newPosition = Selection.ThisShip.GetCenter();
+                newBounds = Selection.ThisShip.ShipBase.GetBounds();
+
+                if (newBounds["maxZ"] > StartingZone.TransformPoint(0.5f, 0.5f, 0.5f).z)
+                {
+                    newPosition.z = StartingZone.TransformPoint(0.5f, 0.5f, 0.5f).z - (newBounds["maxZ"] - newPosition.z + 0.01f);
+
+                    Selection.ThisShip.SetCenter(newPosition);
+                }
+            }
+        }
+
+        private void FixXPosition()
+        {
+            Vector3 newPosition = Selection.ThisShip.GetCenter();
+            Dictionary<string, float> newBounds = Selection.ThisShip.ShipBase.GetBounds();
+
             if (newBounds["maxX"] > StartingZone.TransformPoint(0.5f, 0.5f, 0.5f).x) newPosition.x = StartingZone.TransformPoint(0.5f, 0.5f, 0.5f).x - (newBounds["maxX"] - newPosition.x + 0.01f);
             if (newBounds["minX"] < StartingZone.TransformPoint(-0.5f, -0.5f, -0.5f).x) newPosition.x = StartingZone.TransformPoint(-0.5f, -0.5f, -0.5f).x + (newPosition.x - newBounds["minX"] + 0.01f);
-
+            
             Selection.ThisShip.SetCenter(newPosition);
         }
 
@@ -477,7 +567,38 @@ namespace SubPhases
         {
             SetupSubPhase setupSubPhase = Phases.CurrentSubPhase as SetupSubPhase;
 
-            return ship.ShipBase.IsInside(setupSubPhase.StartingZone);
+            return ship.ShipBase.IsInside(setupSubPhase.StartingZone) || LargeShipSetupRuleIsActive(ship);
+        }
+
+        private static bool LargeShipSetupRuleIsActive(GenericShip ship)
+        {
+            bool result = false;
+
+            if (ship.ShipInfo.BaseSize == BaseSize.Large)
+            {
+                Dictionary<string, float> bounds = Selection.ThisShip.ShipBase.GetBounds();
+                Transform startingZone = (Phases.CurrentSubPhase as SetupSubPhase).StartingZone;
+
+                if ((bounds["maxX"] <= startingZone.TransformPoint(0.5f, 0.5f, 0.5f).x)
+                    && (bounds["minX"] >= startingZone.TransformPoint(-0.5f, -0.5f, -0.5f).x)
+                )
+                {
+                    if (Phases.CurrentSubPhase.RequiredPlayer == Players.PlayerNo.Player1
+                        && (bounds["minZ"] - startingZone.TransformPoint(-0.5f, -0.5f, -0.5f).z <= 0.02f)
+                    )
+                    {
+                        result = true;
+                    }
+                    else if (Phases.CurrentSubPhase.RequiredPlayer == Players.PlayerNo.Player2
+                        && (startingZone.TransformPoint(0.5f, 0.5f, 0.5f).z - bounds["maxZ"] <= 0.02f)
+                    )
+                    {
+                        result = true;
+                    }
+                }
+            }
+
+            return result;
         }
 
         public override void NextButton() {

@@ -17,7 +17,7 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Roark Garnet",
                     4,
-                    41,
+                    38,
                     isLimited: true,
                     abilityType: typeof(Abilities.SecondEdition.RoarkGarnetAbility),
                     extraUpgradeIcon: UpgradeType.Talent,
@@ -34,7 +34,7 @@ namespace Abilities.SecondEdition
     {
         protected override string GenerateAbilityMessage()
         {
-            return "Choose another friendly ship.\nUntil the end of the phase, treat that ship's pilot skill value as \"7\".";
+            return "Choose another friendly ship in arc.\nUntil the end of the phase, treat that ship's pilot skill value as \"7\".";
         }
 
         public override void ModifyPilotSkill(ref int pilotSkill)

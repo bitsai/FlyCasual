@@ -5,10 +5,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using SubPhases;
+using Ship;
 
 public static class DirectionsMenu
 {
     private static readonly float WarningPanelHeight = 55f;
+    private static bool HasAnyAvailableManeuver = true;
 
     public static bool IsVisible
     {
@@ -44,6 +46,14 @@ public static class DirectionsMenu
         Phases.CurrentSubPhase.IsReadyForCommands = true;
 
         if (isRegularPlanning) Selection.ThisShip.Owner.AskAssignManeuver();
+
+        if (!HasAnyAvailableManeuver)
+        {
+            Messages.ShowError("No available maneuvers!");
+
+            DirectionsMenu.Hide();
+            DirectionsMenu.FinishManeuverSelections();
+        }
     }
 
     public static void ShowForAll(Action<string> doWithSelectedManeuver, Action callback, Func<string, bool> filter = null)
@@ -106,6 +116,7 @@ public static class DirectionsMenu
     private static void CustomizeDirectionsMenu(Func<string, bool> filter = null)
     {
         List<char> linesExist = new List<char>();
+        HasAnyAvailableManeuver = false;
 
         foreach (KeyValuePair<string, MovementComplexity> maneuverData in Selection.ThisShip.GetManeuvers())
         {
@@ -131,6 +142,8 @@ public static class DirectionsMenu
             {
                 if (filter == null || filter(maneuverData.Key))
                 {
+                    HasAnyAvailableManeuver = true;
+
                     if (!linesExist.Contains(maneuverSpeed)) linesExist.Add(maneuverSpeed);
 
                     SetManeuverColor(button, maneuverData);
@@ -350,6 +363,18 @@ namespace SubPhases
         {
             Phases.CurrentSubPhase = PreviousSubPhase;
             CallBack();
+        }
+
+        public override bool ThisShipCanBeSelected(GenericShip ship, int mouseKeyIsPressed)
+        {
+            bool result = false;
+            return result;
+        }
+
+        public override bool AnotherShipCanBeSelected(GenericShip anotherShip, int mouseKeyIsPressed)
+        {
+            bool result = false;
+            return result;
         }
     }
 }

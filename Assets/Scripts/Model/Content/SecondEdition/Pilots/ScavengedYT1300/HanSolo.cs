@@ -18,11 +18,14 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Han Solo",
                     6,
-                    71,
+                    65,
                     isLimited: true,
                     abilityType: typeof(Abilities.SecondEdition.HanSoloResistancePilotAbility),
                     extraUpgradeIcon: UpgradeType.Talent
                 );
+
+                PilotNameCanonical = "hansolo-scavengedyt1300";
+
                 ImageUrl = "https://sb-cdn.fantasyflightgames.com/card_images/en/5816bd53c272ed50096e22ae1af2b38a.png";
             }
         }

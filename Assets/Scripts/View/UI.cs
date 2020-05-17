@@ -259,7 +259,7 @@ public class UI : MonoBehaviour {
     public static void ClickDeclareTarget()
     {
         GameCommand command = Combat.GenerateIntentToAttackCommand(Selection.ThisShip.ShipId, Selection.AnotherShip.ShipId);
-        if (command != null) GameMode.CurrentGameMode.ExecuteCommand(command);
+        if (command != null) GameMode.CurrentGameMode.ExecuteServerCommand(command);
     }
 
     public static void CheckFiringRangeAndShow()
@@ -353,6 +353,14 @@ public class UI : MonoBehaviour {
     public void RestartMatch()
     {
         Rules.FinishGame();
-        SquadBuilder.ReGenerateSquads(SquadBuilder.SwitchToBattleScene);
+        if (ReplaysManager.Mode == ReplaysMode.Write)
+        {
+            SquadBuilder.ReGenerateSquads(SquadBuilder.SwitchToBattleScene);
+        }
+        else if (ReplaysManager.Mode == ReplaysMode.Read)
+        {
+            GameController.StartBattle(ReplaysMode.Read);
+        }
+        
     }
 }

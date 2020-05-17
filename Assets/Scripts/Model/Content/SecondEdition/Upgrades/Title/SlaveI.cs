@@ -14,7 +14,7 @@ namespace UpgradesList.SecondEdition
             UpgradeInfo = new UpgradeCardInfo(
                 "Slave I",
                 UpgradeType.Title,
-                cost: 2,
+                cost: 1,
                 isLimited: true,
                 addSlot: new UpgradeSlot(UpgradeType.Torpedo),
                 restriction: new ShipRestriction(typeof(Ship.SecondEdition.FiresprayClassPatrolCraft.FiresprayClassPatrolCraft)),
@@ -49,7 +49,7 @@ namespace Abilities.SecondEdition
         {
             if (HostShip.AssignedManeuver.Bearing == ManeuverBearing.Bank || HostShip.AssignedManeuver.Bearing == ManeuverBearing.Turn)
             {
-                HostShip.Owner.ChangeManeuver(GameMode.CurrentGameMode.AssignManeuver, Triggers.FinishTrigger, IsManeuverSameSpeedAndBearing);
+                HostShip.Owner.ChangeManeuver(ShipMovementScript.SendAssignManeuverCommand, Triggers.FinishTrigger, IsManeuverSameSpeedAndBearing);
             }
             else
             {

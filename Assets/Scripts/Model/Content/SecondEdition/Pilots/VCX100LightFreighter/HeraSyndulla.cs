@@ -11,12 +11,14 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Hera Syndulla",
                     5,
-                    73,
+                    72,
                     isLimited: true,
                     abilityType: typeof(Abilities.FirstEdition.HeraSyndullaAbility),
                     extraUpgradeIcon: UpgradeType.Talent,
                     seImageNumber: 73
                 );
+
+                PilotNameCanonical = "herasyndulla-vcx100lightfreighter";
             }
         }
     }

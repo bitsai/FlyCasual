@@ -1,5 +1,6 @@
 ﻿using Arcs;
 using BoardTools;
+using Players;
 using Ship;
 using SubPhases;
 using System;
@@ -66,11 +67,20 @@ namespace Abilities.SecondEdition
         {
             bool result = false;
 
+            if (ship.Owner.PlayerNo != HostShip.Owner.PlayerNo) return false;
+
             if (ship.ShipId == HostShip.ShipId) return false;
 
             DistanceInfo distInfo = new DistanceInfo(HostShip, ship);
             if (distInfo.Range > 1) return false;
 
+            result = CheckInArcRequirements(ship);
+
+            return result;
+        }
+
+        protected virtual bool CheckInArcRequirements(GenericShip ship)
+        {
             foreach (GenericArc arc in Combat.Attacker.ArcsInfo.Arcs)
             {
                 ShotInfoArc shotInfoArcDefender = new ShotInfoArc(Combat.Attacker, HostShip, arc);
@@ -81,7 +91,7 @@ namespace Abilities.SecondEdition
                 }
             }
 
-            return result;
+            return false;
         }
 
         private void AskToRedirect(object sender, EventArgs e)
@@ -93,8 +103,14 @@ namespace Abilities.SecondEdition
                 HostShip.Owner.PlayerNo,
                 HostShip.PilotInfo.PilotName,
                 "Select another friendly ship to redirect one damage result",
-                HostShip
+                HostShip,
+                showSkipButton: IsShowSkipButton()
             );
+        }
+
+        protected virtual bool IsShowSkipButton()
+        {
+            return true;
         }
 
         private void RedirectTargetIsSelected()
@@ -117,10 +133,10 @@ namespace Abilities.SecondEdition
 
         private void StartHitCritDecisionSubphase()
         {
-            var subphase = Phases.StartTemporarySubPhaseNew<HitOrCritDecisionSubphase>("Prince Xizor", Triggers.FinishTrigger);
+            var subphase = Phases.StartTemporarySubPhaseNew<HitOrCritDecisionSubphase>(HostName, Triggers.FinishTrigger);
 
-            subphase.DescriptionShort = "Prince Xizor";
-            subphase.DescriptionLong = "Suffer Hit or Crit result instead of Prince Xizor?";
+            subphase.DescriptionShort = HostName;
+            subphase.DescriptionLong = "Suffer Hit or Crit result instead of " + HostName + "?";
             subphase.ImageSource = HostShip;
 
             subphase.AddDecision(

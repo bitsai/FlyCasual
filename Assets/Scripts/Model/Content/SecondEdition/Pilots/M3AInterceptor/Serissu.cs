@@ -13,7 +13,7 @@ namespace Ship
                 PilotInfo = new PilotCardInfo(
                     "Serissu",
                     5,
-                    40,
+                    41,
                     isLimited: true,
                     abilityType: typeof(Abilities.SecondEdition.SerissuAbility),
                     extraUpgradeIcon: UpgradeType.Talent,
@@ -41,14 +41,14 @@ namespace Abilities.SecondEdition
 
         private void AddSerissuAbility(GenericShip ship)
         {
-            Combat.Defender.AddAvailableDiceModification(new SerissuAction() { HostShip = this.HostShip });
+            Combat.Defender.AddAvailableDiceModification(new SerissuAction() { ImageUrl = HostShip.ImageUrl }, HostShip);
         }
 
         protected class SerissuAction : FriendlyRerollAction
         {
             public SerissuAction() : base(1, 1, true, RerollTypeEnum.DefenseDice)
             {
-                Name = DiceModificationName = "Serissu's ability";
+                Name = DiceModificationName = "Serissu";
             }
         }
     }

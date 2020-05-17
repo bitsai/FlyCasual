@@ -14,14 +14,16 @@ namespace UpgradesList.SecondEdition
         public HanSoloResistance() : base()
         {
             UpgradeInfo = new UpgradeCardInfo(
-                "Han Solo (Resistance)",
+                "Han Solo",
                 UpgradeType.Crew,
-                cost: 6,
+                cost: 4,
                 isLimited: true,
                 restriction: new FactionRestriction(Faction.Resistance),
                 addAction: new ActionInfo(typeof(EvadeAction), ActionColor.Red),
                 abilityType: typeof(Abilities.SecondEdition.HanSoloResistanceCrewAbility)
             );
+
+            NameCanonical = "hansolo-crew";
 
             ImageUrl = "https://sb-cdn.fantasyflightgames.com/card_images/en/622ea4b573afbb5c95b3e9f2989a8aef.png";
         }        

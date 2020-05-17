@@ -11,12 +11,11 @@ namespace UpgradesList.FirstEdition
             UpgradeInfo = new UpgradeCardInfo(
                 "Twin Ion Engine Mk. II",
                 UpgradeType.Modification,
-                cost: 2,
+                cost: 1,
                 abilityType: typeof(Abilities.FirstEdition.TwinIonEngineMkIIAbility)
             );
 
-            // TODOREVERT
-            // ImageUrl = ImageUrls.GetImageUrl(this, "twin-ion-engine-mkii.png");
+            ImageUrl = ImageUrls.GetImageUrl(this, "twin-ion-engine-mkii");
         }
 
         public override bool IsAllowedForShip(GenericShip ship)
