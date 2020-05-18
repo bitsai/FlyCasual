@@ -98,6 +98,8 @@ namespace Abilities.SecondEdition
 {
     public class PinpointTractorArray : GenericAbility
     {
+        public override string Name { get { return "Pinpoint Tractor Array"; } }
+
         public override void ActivateAbility()
         {
             HostShip.OnGetAvailableArcFacings += RestrictArcFacings;

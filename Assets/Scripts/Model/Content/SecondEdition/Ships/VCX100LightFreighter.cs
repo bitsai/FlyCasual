@@ -41,6 +41,8 @@ namespace Abilities.SecondEdition
 {
     public class TailGunnerAbility : GenericAbility
     {
+        public override string Name { get { return "Tail Gun"; } }
+
         public override void ActivateAbility()
         {
             HostShip.OnAnotherShipDocked += ActivateRearArc;

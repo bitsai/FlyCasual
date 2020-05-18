@@ -82,6 +82,8 @@ namespace Abilities.SecondEdition
 {
     public class CoPilotAbility : GenericAbility
     {
+        public override string Name { get { return "Co-Pilot"; } }
+
         public override void ActivateAbility()
         {
             HostShip.OnDocked += CopyPilotAbilityToHost;

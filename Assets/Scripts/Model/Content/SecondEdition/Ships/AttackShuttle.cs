@@ -30,6 +30,8 @@ namespace Abilities.SecondEdition
 {
     public class LockedAndLoadedability : GenericAbility
     {
+        public override string Name { get { return "Locked and Loaded"; } }
+
         public override void ActivateAbility()
         {
             HostShip.OnDocked += ActivateDockedAbility;
