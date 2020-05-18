@@ -17,7 +17,7 @@ namespace Ship
                 ShipInfo.BaseSize = BaseSize.Medium;
                 ShipInfo.ActionIcons.AddActions(new ActionInfo(typeof(CoordinateAction), ActionColor.Red));
 
-                ShipAbilities.Add(new Abilities.FirstEdition.AdvancedAileronsAbility());
+                ShipAbilities.Add(new Abilities.FirstEdition.AdaptiveAileronsAbility());
 
                 DialInfo.ChangeManeuverComplexity(new ManeuverHolder(ManeuverSpeed.Speed1, ManeuverDirection.Left, ManeuverBearing.Turn), MovementComplexity.Complex);
                 DialInfo.ChangeManeuverComplexity(new ManeuverHolder(ManeuverSpeed.Speed1, ManeuverDirection.Left, ManeuverBearing.Bank), MovementComplexity.Easy);

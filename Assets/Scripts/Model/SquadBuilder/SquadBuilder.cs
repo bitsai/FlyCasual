@@ -203,6 +203,27 @@ namespace SquadBuilderNS
                         });
 
                         GetPilotsList(ns);
+
+                        foreach (var shipAbility in newShipTypeContainer.ShipAbilities)
+                        {
+                            OmniUpgrade newUpgradeContainer = new OmniUpgrade(new UpgradeCardInfo(
+                                shipAbility.Name,
+                                UpgradeType.Omni,
+                                cost: 0,
+                                abilityType: shipAbility.GetType()
+                            ));
+                            //newUpgradeContainer.ImageUrl = newShipTypeContainer.ImageUrl;
+                            newUpgradeContainer.NameCanonical = Tools.Canonicalize(shipAbility.Name) + "(" + newShipTypeContainer.ShipTypeCanonical + ")";
+
+                            AllUpgrades.Add(new UpgradeRecord()
+                            {
+                                UpgradeName = newUpgradeContainer.UpgradeInfo.Name,
+                                UpgradeNameCanonical = newUpgradeContainer.NameCanonical,
+                                UpgradeTypeName = UpgradeType.Omni.ToString(),
+                                UpgradeType = UpgradeType.Omni,
+                                Instance = newUpgradeContainer
+                            });
+                        }
                     }
                 }
             }

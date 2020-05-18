@@ -30,6 +30,8 @@ namespace Abilities.FirstEdition
 {
     public class AdaptiveAileronsAbility : GenericAbility
     {
+        public override string Name { get { return "Adaptive Ailerons"; } }
+
         private GenericMovement SavedManeuver;
 
         private static readonly List<string> ChangedManeuversCodes = new List<string>() { "1.L.B", "1.F.S", "1.R.B" };
