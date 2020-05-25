@@ -53,7 +53,7 @@ public class CameraScript : MonoBehaviour {
     private const float SENSITIVITY_MOVE = 0.125f;
     private const float SENSITIVITY_TURN = 5;
     private const float SENSITIVITY_ZOOM = 5;
-    private const float MOUSE_MOVE_START_OFFSET = 5f;
+    private const float MOUSE_MOVE_START_OFFSET = 1f;
     private const float BORDER_SQUARE = 18f;
     private const float MAX_HEIGHT = 8f;
     private const float MIN_HEIGHT = 1.5f;
@@ -214,8 +214,16 @@ public class CameraScript : MonoBehaviour {
         if (Console.IsActive || Input.GetKey(KeyCode.LeftControl)) return;
         float runScale = (Input.GetKey(KeyCode.LeftShift)) ? 3 : 1;
 
-        float x = Input.GetAxis("Horizontal") * SENSITIVITY_MOVE * runScale;
-        float y = Input.GetAxis("Vertical") * SENSITIVITY_MOVE * runScale;
+        float x = 0;
+        if (Input.GetKey(KeyCode.A)) x += -1f;
+        if (Input.GetKey(KeyCode.D)) x += 1f;
+        if (x != 0) x = x * SENSITIVITY_MOVE * runScale;
+
+        float y = 0;
+        if (Input.GetKey(KeyCode.S)) y += -1f;
+        if (Input.GetKey(KeyCode.W)) y += 1f;
+        if (y != 0) y = y * SENSITIVITY_MOVE * runScale;
+
         if ((x != 0) || (y != 0)) WhenViewChanged();
         transform.Translate (x, y, 0);
 	}
