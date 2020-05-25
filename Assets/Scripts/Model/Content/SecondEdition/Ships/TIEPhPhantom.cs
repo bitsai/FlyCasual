@@ -41,7 +41,17 @@ namespace Abilities.SecondEdition
 {
     public class StygiumArray : GenericAbility
     {
-        public override string Name { get { return "Stygium Array (ID:" + HostShip.ShipId + ")"; } }
+        public override string Name {
+            get {
+                if (HostShip != null)
+                {
+                    return "Stygium Array (ID:" + HostShip.ShipId + ")";
+                } else
+                {
+                    return "Stygium Array";
+                }
+            }
+        }
 
         public override void ActivateAbility()
         {
