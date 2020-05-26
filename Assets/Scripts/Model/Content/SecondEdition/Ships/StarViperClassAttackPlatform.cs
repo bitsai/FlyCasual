@@ -22,7 +22,7 @@ namespace Ship
                 ShipInfo.ActionIcons.AddLinkedAction(new LinkedActionInfo(typeof(BarrelRollAction), typeof(FocusAction)));
                 ShipInfo.ActionIcons.AddLinkedAction(new LinkedActionInfo(typeof(BoostAction), typeof(FocusAction)));
 
-                ShipAbilities.Add(new Abilities.FirstEdition.StarViperMkIIAbility());
+                ShipAbilities.Add(new Abilities.SecondEdition.MicrothrustersAbility());
 
                 DialInfo.ChangeManeuverComplexity(new ManeuverHolder(ManeuverSpeed.Speed2, ManeuverDirection.Left, ManeuverBearing.Bank), MovementComplexity.Easy);
                 DialInfo.ChangeManeuverComplexity(new ManeuverHolder(ManeuverSpeed.Speed2, ManeuverDirection.Right, ManeuverBearing.Bank), MovementComplexity.Easy);
@@ -30,5 +30,13 @@ namespace Ship
                 ManeuversImageUrl = "https://vignette.wikia.nocookie.net/xwing-miniatures-second-edition/images/e/e1/Maneuver_starviper.png";
             }
         }
+    }
+}
+
+namespace Abilities.SecondEdition
+{
+    public class MicrothrustersAbility: FirstEdition.StarViperMkIIAbility
+    {
+        public override string Name { get { return "Microthrusters"; } }
     }
 }

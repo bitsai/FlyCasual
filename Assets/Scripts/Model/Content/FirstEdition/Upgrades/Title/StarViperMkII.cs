@@ -28,8 +28,6 @@ namespace Abilities.FirstEdition
 {
     public class StarViperMkIIAbility : GenericAbility
     {
-        public override string Name { get { return "Microthrusters"; } }
-
         public override void ActivateAbility()
         {
             HostShip.OnGetAvailableBarrelRollTemplates += ChangeBarrelRollTemplates;

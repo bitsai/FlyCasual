@@ -21,10 +21,18 @@ namespace Ship
                 DialInfo.ChangeManeuverComplexity(new ManeuverHolder(ManeuverSpeed.Speed2, ManeuverDirection.Right, ManeuverBearing.Bank), MovementComplexity.Normal);
                 DialInfo.AddManeuver(new ManeuverHolder(ManeuverSpeed.Speed5, ManeuverDirection.Forward, ManeuverBearing.Straight), MovementComplexity.Normal);
 
-                ShipAbilities.Add(new Abilities.FirstEdition.HardPointAbility());
+                ShipAbilities.Add(new Abilities.SecondEdition.WeaponHardPointAbility());
 
                 ManeuversImageUrl = "https://vignette.wikia.nocookie.net/xwing-miniatures-second-edition/images/2/2a/Maneuver_m3a.png";
             }
         }
+    }
+}
+
+namespace Abilities.SecondEdition
+{
+    public class WeaponHardPointAbility : FirstEdition.HardPointAbility
+    {
+        public override string Name { get { return "Weapon Hardpoint"; } }
     }
 }

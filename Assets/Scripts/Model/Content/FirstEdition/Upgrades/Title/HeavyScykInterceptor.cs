@@ -26,8 +26,6 @@ namespace Abilities.FirstEdition
 {
     public class HardPointAbility : GenericAbility
     {
-        public override string Name { get { return "Weapon Hardpoint"; } }
-
         private readonly List<UpgradeType> HardpointSlotTypes = new List<UpgradeType>
         {
             UpgradeType.Cannon,
