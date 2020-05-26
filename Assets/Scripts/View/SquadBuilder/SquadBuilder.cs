@@ -741,7 +741,6 @@ namespace SquadBuilderNS
             GenericUpgrade newUpgrade = (upgrade.UpgradeType == UpgradeType.Omni) ?
                 new OmniUpgrade(upgrade.Instance.UpgradeInfo) :
                 (GenericUpgrade)System.Activator.CreateInstance(Type.GetType(upgrade.UpgradeTypeName));
-            newUpgrade.ImageUrl = upgrade.Instance.ImageUrl;
             newUpgrade.NameCanonical = upgrade.UpgradeNameCanonical;
             if (newUpgrade is IVariableCost && Edition.Current is SecondEdition) (newUpgrade as IVariableCost).UpdateCost(CurrentSquadBuilderShip.Instance);
             Edition.Current.AdaptUpgradeToRules(newUpgrade);

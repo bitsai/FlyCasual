@@ -212,8 +212,7 @@ namespace SquadBuilderNS
                                 cost: 0,
                                 abilityType: shipAbility.GetType()
                             ));
-                            //newUpgradeContainer.ImageUrl = newShipTypeContainer.ImageUrl;
-                            newUpgradeContainer.NameCanonical = Tools.Canonicalize(shipAbility.Name) + "(" + newShipTypeContainer.ShipTypeCanonical + ")";
+                            newUpgradeContainer.NameCanonical = Tools.Canonicalize(shipAbility.Name) + " (" + newShipTypeContainer.ShipTypeCanonical + ")";
 
                             AllUpgrades.Add(new UpgradeRecord()
                             {
@@ -293,8 +292,7 @@ namespace SquadBuilderNS
                                 cost: 0,
                                 abilityType: newShipContainer.PilotInfo.AbilityType
                             ));
-                            newUpgradeContainer.ImageUrl = newShipContainer.ImageUrl;
-                            newUpgradeContainer.NameCanonical = newShipContainer.PilotNameCanonical + "(" + newShipContainer.ShipTypeCanonical + ")";
+                            newUpgradeContainer.NameCanonical = newShipContainer.PilotNameCanonical + " (" + newShipContainer.ShipTypeCanonical + ")";
 
                             AllUpgrades.Add(new UpgradeRecord()
                             {
@@ -422,7 +420,6 @@ namespace SquadBuilderNS
             GenericUpgrade newUpgrade = (upgrade.UpgradeType == UpgradeType.Omni) ?
                 new OmniUpgrade(upgrade.Instance.UpgradeInfo) :
                 (GenericUpgrade)System.Activator.CreateInstance(Type.GetType(upgrade.UpgradeTypeName));
-            newUpgrade.ImageUrl = upgrade.Instance.ImageUrl;
             newUpgrade.NameCanonical = upgrade.UpgradeNameCanonical;
             Edition.Current.AdaptUpgradeToRules(newUpgrade);
             if (newUpgrade is IVariableCost && Edition.Current is SecondEdition) (newUpgrade as IVariableCost).UpdateCost(ship.Instance);
