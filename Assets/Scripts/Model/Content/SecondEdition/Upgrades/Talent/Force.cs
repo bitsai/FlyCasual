@@ -14,9 +14,6 @@ namespace UpgradesList.SecondEdition
                 cost: 0,
                 addForce: 1
             );
-
-            //TODO add image
-            //ImageUrl = "https://i.imgur.com/nvHEwLO.png";
         }
     }
 }
